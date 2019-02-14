@@ -18,11 +18,12 @@
 
 cd mysql-server
 # build project
+rm -r ./components/test/perfschema/
 mkdir build
 cd build
-cmake .. -DDOWNLOAD_BOOST=1 -DWITH_BOOST=$WORK -DWITH_SSL=system
+cmake .. -DDOWNLOAD_BOOST=1 -DWITH_BOOST=$WORK -DWITH_SSL=system -DDISABLE_SHARED=1
 #make clean
-make -j$(nproc)
+make #-j$(nproc)
 
 
 # build fuzz targets
@@ -30,4 +31,4 @@ make -j$(nproc)
 
 #TODO corpus, options
 
-cp ./* $OUT
+#cp ./* $OUT

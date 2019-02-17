@@ -16,15 +16,24 @@
 #
 ################################################################################
 
+rm -f -r $OUT/*
+
 cd mysql-server
+git branch -f fuzzing
+git checkout fuzzing
+git pull origin fuzzing
+
+
+sed -i -e "s/ADD_SUBDIRECTORY(r/#ADD_SUBDIRECTORY(r/g" ./CMakeLists.txt
 # build project
 rm -r ./components/test/perfschema/
 mkdir build
 cd build
-cmake .. -DDOWNLOAD_BOOST=1 -DWITH_BOOST=$WORK -DWITH_SSL=system -DDISABLE_SHARED=1
+cmake .. -DDOWNLOAD_BOOST=1 -DWITH_BOOST=$WORK -DWITH_SSL=system -DDISABLE_SHARED=1 #Il y a aussi DWITHOUT_SERVER à considérer...
 #make clean
-make #-j$(nproc)
-
+#make -j$(nproc)
+make GenError -j$(nproc)
+make validate_password_fuzz
 
 # build fuzz targets
 #TODO
@@ -32,3 +41,5 @@ make #-j$(nproc)
 #TODO corpus, options
 
 #cp ./* $OUT
+
+cp $SRC/mysql-server/build/bin/validate_password_fuzz $OUT

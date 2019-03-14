@@ -26,7 +26,7 @@ git pull origin fuzzing
 
 sed -i -e "s/ADD_SUBDIRECTORY(r/#ADD_SUBDIRECTORY(r/g" ./CMakeLists.txt
 # build project
-rm -r ./components/test/perfschema/
+rm -f -r ./components/test/perfschema/
 mkdir build
 cd build
 cmake .. -DDOWNLOAD_BOOST=1 -DWITH_BOOST=$WORK -DWITH_SSL=system -DDISABLE_SHARED=1 -DFUZZING=1 #Il y a aussi DWITHOUT_SERVER à considérer...

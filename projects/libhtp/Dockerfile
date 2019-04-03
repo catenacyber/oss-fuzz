@@ -16,7 +16,8 @@
 
 FROM gcr.io/oss-fuzz-base/base-builder
 MAINTAINER victor@inliniac.net
-RUN apt-get update && apt-get install -y make autoconf automake libtool zlib1g-dev
+RUN apt-get update && apt-get install -y make autoconf automake autopoint libtool zlib1g-dev
+RUN git clone https://git.tukaani.org/xz.git xz
 RUN git clone --depth 1 https://github.com/OISF/libhtp.git libhtp
 WORKDIR $SRC
 COPY build.sh $SRC/

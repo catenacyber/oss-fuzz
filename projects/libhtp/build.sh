@@ -15,15 +15,23 @@
 #
 ################################################################################
 
+#build liblzma
+cd xz
+sh autogen.sh
+./configure --disable-shared
+cd src/liblzma
+make install
+cd ../../..
+
 # build project
 cd libhtp
 sh autogen.sh
-./configure
+./configure --disable-shared
 make
 
 $CC $CFLAGS -I. -c test/fuzz/fuzz_htp.c -o fuzz_htp.o
 $CC $CFLAGS -I. -c test/test.c -o test.o
-$CXX $CXXFLAGS fuzz_htp.o test.o -o $OUT/fuzz_htp ./htp/.libs/libhtp.a -lFuzzingEngine -lz
+$CXX $CXXFLAGS fuzz_htp.o test.o -o $OUT/fuzz_htp ./htp/.libs/libhtp.a ../xz/src/liblzma/.libs/liblzma.a -lFuzzingEngine -lz
 
 # builds corpus
 zip -r $OUT/fuzz_htp_seed_corpus.zip test/files/*.t

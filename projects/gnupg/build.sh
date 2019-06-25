@@ -17,20 +17,20 @@
 
 #compile and link statically dependencies
 cd ..
-tar -xvf libgpg-error-1.32.tar.bz2
-cd libgpg-error-1.32
+tar -xvf libgpg-error-1.36.tar.bz2
+cd libgpg-error-1.36
 ./configure --enable-static --disable-shared
 make
 make install
 cd ..
-tar -xvf libgcrypt-1.8.2.tar.bz2
-cd libgcrypt-1.8.2
+tar -xvf libgcrypt-1.8.4.tar.bz2
+cd libgcrypt-1.8.4
 ./configure --enable-static --disable-shared
 make
 make install
 cd ..
-tar -xvf libassuan-2.5.1.tar.bz2
-cd libassuan-2.5.1
+tar -xvf libassuan-2.5.3.tar.bz2
+cd libassuan-2.5.3
 ./configure --enable-static --disable-shared
 make
 make install
@@ -41,8 +41,8 @@ cd libksba-1.3.5
 make
 make install
 cd ..
-tar -xvf npth-1.5.tar.bz2
-cd npth-1.5
+tar -xvf npth-1.6.tar.bz2
+cd npth-1.6
 ./configure --enable-static --disable-shared
 make
 make install

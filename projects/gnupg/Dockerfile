@@ -16,18 +16,19 @@
 
 FROM gcr.io/oss-fuzz-base/base-builder
 MAINTAINER p.antoine@catenacyber.fr
-RUN apt-get update && apt-get install -y make autoconf automake libtool gettext bzip2 gnupg
+RUN apt-get update && apt-get install -y make autoconf automake libtool gettext bzip2 gnupg bison flex
 
 #wait for zesty, or backport ?
-RUN curl -O https://www.gnupg.org/ftp/gcrypt/libgpg-error/libgpg-error-1.36.tar.bz2
-RUN curl -O https://www.gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.8.4.tar.bz2
-RUN curl -O https://www.gnupg.org/ftp/gcrypt/libassuan/libassuan-2.5.3.tar.bz2
-RUN curl -O https://www.gnupg.org/ftp/gcrypt/libksba/libksba-1.3.5.tar.bz2
-RUN curl -O https://www.gnupg.org/ftp/gcrypt/npth/npth-1.6.tar.bz2
+RUN git clone --depth 1 git://git.gnupg.org/libgpg-error.git libgpg-error
+RUN git clone --depth 1 git://git.gnupg.org/libgcrypt.git libgcrypt
+RUN git clone --depth 1 git://git.gnupg.org/libassuan.git libassuan
+RUN git clone --depth 1 git://git.gnupg.org/libksba.git libksba
+RUN git clone --depth 1 git://git.gnupg.org/npth.git npth
 
 RUN git clone --depth 1 git://git.gnupg.org/gnupg.git gnupg
 
 WORKDIR gnupg
 COPY fuzzgnupg.diff $SRC/fuzz.diff
+COPY lol2.diff $SRC/lol.diff
 COPY fuzz_* $SRC/
 COPY build.sh $SRC/

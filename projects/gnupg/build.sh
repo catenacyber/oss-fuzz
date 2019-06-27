@@ -17,33 +17,33 @@
 
 #compile and link statically dependencies
 cd ..
-tar -xvf libgpg-error-1.36.tar.bz2
-cd libgpg-error-1.36
-./configure --enable-static --disable-shared
+cd libgpg-error
+./autogen.sh
+./configure --disable-doc --enable-static --disable-shared
 make
 make install
 cd ..
-tar -xvf libgcrypt-1.8.4.tar.bz2
-cd libgcrypt-1.8.4
-./configure --enable-static --disable-shared
+cd libgcrypt
+./autogen.sh
+./configure --disable-doc --enable-static --disable-shared
 make
 make install
 cd ..
-tar -xvf libassuan-2.5.3.tar.bz2
-cd libassuan-2.5.3
-./configure --enable-static --disable-shared
+cd libassuan
+./autogen.sh
+./configure --disable-doc --enable-static --disable-shared
 make
 make install
 cd ..
-tar -xvf libksba-1.3.5.tar.bz2
-cd libksba-1.3.5
-./configure --enable-static --disable-shared
+cd libksba
+./autogen.sh
+./configure --disable-doc --enable-static --disable-shared
 make
 make install
 cd ..
-tar -xvf npth-1.6.tar.bz2
-cd npth-1.6
-./configure --enable-static --disable-shared
+cd npth
+./autogen.sh
+./configure --disable-doc --enable-static --disable-shared
 make
 make install
 cd ..
@@ -54,6 +54,7 @@ cd gnupg
 mkdir tests/fuzz
 cp ../fuzz_* tests/fuzz
 git apply ../fuzz.diff
+git apply ../lol.diff
 ./autogen.sh
 ./configure --disable-doc --enable-maintainer-mode
 make -j$(nproc) all

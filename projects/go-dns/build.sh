@@ -20,6 +20,21 @@ function compile_fuzzer {
   function=$2
   fuzzer=$3
 
+  if [[ $SANITIZER = *coverage* ]]; then
+    cd $GOPATH/src/$path
+    fuzzed_package=`pwd | rev | cut -d'/' -f 1 | rev`
+    cp $GOPATH/ossfuzz_test.go ./"${function,,}"_test.go
+    sed -i -e 's/FuzzFunction/'$function'/' ./"${function,,}"_test.go
+    sed -i -e 's/mypackagebeingfuzzed/'$fuzzed_package'/' ./"${function,,}"_test.go
+    sed -i -e 's/TestFuzzCorpus/Test'$function'Corpus/' ./"${function,,}"_test.go
+
+    echo "#/bin/sh" > $OUT/$fuzzer
+    echo "cd $path" >> $OUT/$fuzzer
+    echo "go test -run Test${function}Corpus -v -tags fuzz -coverprofile \$1 " >> $OUT/$fuzzer
+
+    cd -
+    return 0
+  fi
   # Compile and instrument all Go files relevant to this fuzz target.
   go-fuzz -tags fuzz -func $function -o $fuzzer.a $path
 

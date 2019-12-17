@@ -111,8 +111,22 @@ function run_fuzz_target {
   fi
 }
 
+export GOPATH=/out/root/go
 # Run each fuzz target, generate raw coverage dumps.
 for fuzz_target in $FUZZ_TARGETS; do
+  # Test if fuzz target is a golang one.
+  if [[ $FUZZING_LANGUAGE == "go" ]]; then
+    # Continue if not a fuzz target.
+    if [[ $FUZZING_ENGINE != "none" ]]; then
+      grep "go test -run" $fuzz_target > /dev/null 2>&1 || continue
+    fi
+    cd $GOPATH/src
+    echo "Running go target $fuzz_target"
+    export FUZZ_CORPUS_DIR="/corpus/${fuzz_target}/"
+    bash $OUT/$fuzz_target $DUMPS_DIR/$fuzz_target.profdata
+    cd $OUT
+    continue
+  fi
   # Continue if not a fuzz target.
   if [[ $FUZZING_ENGINE != "none" ]]; then
     grep "LLVMFuzzerTestOneInput" $fuzz_target > /dev/null 2>&1 || continue
@@ -135,6 +149,13 @@ for fuzz_target in $FUZZ_TARGETS; do
     n_child_proc=$(jobs -rp | wc -l)
   done
 done
+
+if [[ $FUZZING_LANGUAGE == "go" ]]; then
+  /root/go/bin/gocovmerge $DUMPS_DIR/*.profdata > fuzz.cov
+  go tool cover -html=fuzz.cov -o $REPORT_ROOT_DIR/index.html
+  cp $REPORT_ROOT_DIR/index.html $REPORT_PLATFORM_DIR/index.html
+  echo "End for go targets"
+else
 
 # Wait for background processes to finish.
 wait
@@ -165,6 +186,8 @@ llvm-cov export -summary-only $LLVM_COV_ARGS > $SUMMARY_FILE
 # Post process HTML report.
 coverage_helper -v post_process -src-root-dir=/ -summary-file=$SUMMARY_FILE \
     -output-dir=$REPORT_ROOT_DIR $PATH_EQUIVALENCE_ARGS
+
+fi
 
 if [[ -n $HTTP_PORT ]]; then
   # Serve the report locally.

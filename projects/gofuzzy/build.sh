@@ -28,6 +28,8 @@ function compile_fuzzer {
   $CXX $CXXFLAGS $LIB_FUZZING_ENGINE $fuzzer.a -lpthread -o $OUT/$fuzzer
 }
 
+#TODO remove
+cp -r fuzzy/* /root/go/src/github.com/sahilm/fuzzy/
 
 (
 cd /root/go/src/github.com/sahilm/fuzzy

@@ -20,6 +20,8 @@ RUN apt-get update && apt-get install -y protobuf-compiler
 RUN go get -u github.com/golang/protobuf/protoc-gen-go
 
 RUN go get -t github.com/sahilm/fuzzy
+#TODO remove
+RUN git clone --depth 1 --branch fuzz https://github.com/catenacyber/fuzzy.git fuzzy
 
 COPY build.sh $SRC/
 WORKDIR $SRC/

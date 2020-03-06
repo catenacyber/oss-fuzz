@@ -1,5 +1,5 @@
 #!/bin/bash -eu
-# Copyright 2018 Google Inc.
+# Copyright 2020 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,9 +19,6 @@
 cd quickjs
 # Makefile should not override CFLAGS
 sed -i -e 's/CFLAGS=/CFLAGS+=/' Makefile
-if [ "$ARCHITECTURE" = 'i386' ]; then
-    export CFLAGS="$CFLAGS -m32"
-fi
 CONFIG_CLANG=y make libquickjs.a
 zip -r $OUT/fuzz_eval_seed_corpus.zip tests/*.js
 zip -r $OUT/fuzz_eval_seed_corpus.zip examples/*.js

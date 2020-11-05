@@ -23,7 +23,7 @@ function compile_fuzzer {
   if [[ $SANITIZER = *coverage* ]]; then
     cd $GOPATH/src/$path
     fuzzed_package=`pwd | rev | cut -d'/' -f 1 | rev`
-    cp $GOPATH/ossfuzz_test.go ./"${function,,}"_test.go
+    cp $GOPATH/ossfuzz_coverage_runner.go ./"${function,,}"_test.go
     sed -i -e 's/FuzzFunction/'$function'/' ./"${function,,}"_test.go
     sed -i -e 's/mypackagebeingfuzzed/'$fuzzed_package'/' ./"${function,,}"_test.go
     sed -i -e 's/TestFuzzCorpus/Test'$function'Corpus/' ./"${function,,}"_test.go

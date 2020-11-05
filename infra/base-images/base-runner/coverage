@@ -111,7 +111,7 @@ function run_fuzz_target {
   fi
 }
 
-export GOPATH=/out/root/go
+export GOPATH=$OUT/root/go
 # Run each fuzz target, generate raw coverage dumps.
 for fuzz_target in $FUZZ_TARGETS; do
   # Test if fuzz target is a golang one.
@@ -123,23 +123,23 @@ for fuzz_target in $FUZZ_TARGETS; do
     cd $GOPATH/src
     echo "Running go target $fuzz_target"
     export FUZZ_CORPUS_DIR="/corpus/${fuzz_target}/"
-    bash $OUT/$fuzz_target $DUMPS_DIR/$fuzz_target.profdata
+    bash $OUT/$fuzz_target $DUMPS_DIR/$fuzz_target.profdata &
     cd $OUT
-    continue
-  fi
-  # Continue if not a fuzz target.
-  if [[ $FUZZING_ENGINE != "none" ]]; then
-    grep "LLVMFuzzerTestOneInput" $fuzz_target > /dev/null 2>&1 || continue
-  fi
-
-  echo "Running $fuzz_target"
-  run_fuzz_target $fuzz_target &
-
-  if [[ -z $objects ]]; then
-    # The first object needs to be passed without -object= flag.
-    objects="$fuzz_target"
   else
-    objects="$objects -object=$fuzz_target"
+    # Continue if not a fuzz target.
+    if [[ $FUZZING_ENGINE != "none" ]]; then
+      grep "LLVMFuzzerTestOneInput" $fuzz_target > /dev/null 2>&1 || continue
+    fi
+
+    echo "Running $fuzz_target"
+    run_fuzz_target $fuzz_target &
+
+    if [[ -z $objects ]]; then
+      # The first object needs to be passed without -object= flag.
+      objects="$fuzz_target"
+    else
+      objects="$objects -object=$fuzz_target"
+    fi
   fi
 
   # Do not spawn more processes than the number of CPUs available.

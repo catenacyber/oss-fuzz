@@ -45,11 +45,18 @@ make install
 cd ..
 
 export CARGO_BUILD_TARGET="x86_64-unknown-linux-gnu"
+if [ "$SANITIZER" = "coverage" ]
+then
+    cargo install rustfilt
+    export RUSTFLAGS="$RUSTFLAGS -Zinstrument-coverage"
+fi
+echo "RUSTFLAGS=$RUSTFLAGS"
 
 #we did not put libhtp there before so that cifuzz does not remove it
 mv libhtp suricata/
 # build project
 cd suricata
+git apply ../patch.diff
 sh autogen.sh
 #run configure with right options
 ./src/tests/fuzz/oss-fuzz-configure.sh

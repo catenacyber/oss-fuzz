@@ -37,6 +37,7 @@ RUN apt-get update && apt-get install -y \
     python3 \
     python3-pip \
     wget \
+    curl \
     zip
 
 RUN git clone https://chromium.googlesource.com/chromium/src/tools/code_coverage /opt/code_coverage && \
@@ -51,6 +52,13 @@ ENV MSAN_OPTIONS="print_stats=1:strip_path_prefix=/workspace/:symbolize=1:dedup_
 ENV UBSAN_OPTIONS="print_stacktrace=1:print_summary=1:silence_unsigned_overflow=1:strip_path_prefix=/workspace/:symbolize=1:dedup_token_length=3"
 ENV FUZZER_ARGS="-rss_limit_mb=2560 -timeout=25"
 ENV AFL_FUZZER_ARGS="-m none"
+
+# Install Rust and cargo-fuzz for libFuzzer instrumentation.
+ENV CARGO_HOME=/rust
+ENV RUSTUP_HOME=/rust/rustup
+ENV PATH=$PATH:/rust/bin
+RUN curl https://sh.rustup.rs | sh -s -- -y --default-toolchain=nightly
+RUN cargo install rustfilt
 
 # Download and install the latest stable Go.
 ADD https://storage.googleapis.com/golang/getgo/installer_linux $SRC/
@@ -87,6 +95,7 @@ COPY bad_build_check \
     dataflow_tracer.py \
     download_corpus \
     minijail0 \
+    rcfilt \
     reproduce \
     run_fuzzer \
     run_minijail \

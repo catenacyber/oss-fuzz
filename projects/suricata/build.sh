@@ -50,6 +50,7 @@ export CARGO_BUILD_TARGET="x86_64-unknown-linux-gnu"
 mv libhtp suricata/
 # build project
 cd suricata
+git apply ../patch.diff
 sh autogen.sh
 #run configure with right options
 ./src/tests/fuzz/oss-fuzz-configure.sh

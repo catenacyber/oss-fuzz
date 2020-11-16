@@ -72,6 +72,10 @@ if [ "$SANITIZER" != "undefined" ] && [ "$SANITIZER" != "coverage" ] && [ "$ARCH
 else
   export RUSTFLAGS="--cfg fuzzing -Cdebuginfo=1 -Cforce-frame-pointers"
 fi
+if [ "$SANITIZER" = "coverage" ]
+then
+    export RUSTFLAGS="$RUSTFLAGS -Zinstrument-coverage"
+fi
 
 # Add Rust libfuzzer flags.
 # See https://github.com/rust-fuzz/libfuzzer/blob/master/build.rs#L12.

@@ -24,6 +24,7 @@ COPY --from=base-clang /usr/local/bin/llvm-cov /usr/local/bin/
 COPY --from=base-clang /usr/local/bin/llvm-profdata /usr/local/bin/
 COPY --from=base-clang /usr/local/bin/llvm-symbolizer /usr/local/bin/
 
+RUN apt-get update
 RUN apt-get install -y \
     binutils \
     file \
@@ -34,6 +35,7 @@ RUN apt-get install -y \
     python3 \
     python3-pip \
     wget \
+    curl \
     zip
 
 RUN git clone https://chromium.googlesource.com/chromium/src/tools/code_coverage /opt/code_coverage

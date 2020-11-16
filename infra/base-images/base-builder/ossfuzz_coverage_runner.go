@@ -57,7 +57,7 @@ func TestFuzzCorpus(t *testing.T) {
 	}
 	if profname != "" {
 		pprof.StopCPUProfile()
-		f, err = os.Create(profname + ".heap.prof")
+		f, err := os.Create(profname + ".heap.prof")
 		if err != nil {
 			t.Logf("error creating heap profile file %s\n", err)
 		}

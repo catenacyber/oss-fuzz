@@ -16,7 +16,9 @@
 
 FROM gcr.io/oss-fuzz-base/base-builder
 
-RUN (cd $SRC && git clone --single-branch --depth=1 https://github.com/ethereum/go-ethereum)
+RUN git clone --single-branch --depth=1 https://github.com/ethereum/go-ethereum $GOPATH/src/github.com/ethereum/go-ethereum
 
-RUN cp $SRC/go-ethereum/oss-fuzz.sh $SRC/build.sh
 WORKDIR $SRC/
+COPY patch.diff $SRC/
+RUN (cd $GOPATH/src/github.com/ethereum/go-ethereum/ && git apply $SRC/patch.diff)
+RUN cp $GOPATH/src/github.com/ethereum/go-ethereum/oss-fuzz.sh $SRC/build.sh

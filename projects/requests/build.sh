@@ -16,10 +16,8 @@
 ################################################################################
 
 # Build and install project (using current CFLAGS, CXXFLAGS).
-cd requests
 pip3 install .
 
-# TODO move in upstream repo
 mkdir tests/fuzz/
 cp ../fuzz_server.py tests/fuzz/
 

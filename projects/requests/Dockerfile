@@ -18,5 +18,5 @@ FROM gcr.io/oss-fuzz-base/base-builder
 
 RUN git clone --depth 1 --branch master https://github.com/psf/requests.git
 
-WORKDIR $SRC/
+WORKDIR $SRC/requests
 COPY build.sh fuzz_server.py $SRC/

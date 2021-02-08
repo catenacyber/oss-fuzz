@@ -13,17 +13,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-################################################################################
-
-# we need this until https://github.com/rust-lang/cargo/issues/5450 or similar is merged
+# This is a wrapper around calling cargo
+# This just expands RUSTFLAGS in case of a coverage build
+# We need this until https://github.com/rust-lang/cargo/issues/5450 is merged
 # because cargo uses relative paths for the current crate
 # and absolute paths for its dependencies
+#
+################################################################################
 
-export PATH=/rust/bin:/usr/bin
+export PATH="/rust/bin:$PATH"
 if [ "$SANITIZER" = "coverage" ] && [ $1 = "build" ]
 then
-    abspath=`cargo metadata --no-deps --format-version 1 | jq -r '.workspace_root'`
-    export RUSTFLAGS="$RUSTFLAGS --remap-path-prefix src=$abspath/src"
+    crate_src_abspath=`cargo metadata --no-deps --format-version 1 | jq -r '.workspace_root'`
+    export RUSTFLAGS="$RUSTFLAGS --remap-path-prefix src=$crate_src_abspath/src"
 fi
 
 cargo "$@"

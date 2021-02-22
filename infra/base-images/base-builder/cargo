@@ -31,7 +31,10 @@ fi
 if [ "$SANITIZER" = "coverage" ] && [ $1 = "fuzz" ]
 then
     fuzz_src_abspath=`pwd`
-    export RUSTFLAGS="$RUSTFLAGS --remap-path-prefix fuzz_targets=$fuzz_src_abspath/fuzz/fuzz_targets"
+    export RUSTFLAGS="$RUSTFLAGS --remap-path-prefix fuzz_targets=$fuzz_src_abspath/fuzz_targets"
+    # hack to turn cargo fuzz build in cargo build so as not to have optimizations and still get coverage
+    cd fuzz && cargo build
+    exit 0
 fi
 
 cargo "$@"

@@ -105,7 +105,8 @@ else
 fi
 if [ "$SANITIZER" = "coverage" ]
 then
-    export RUSTFLAGS="$RUSTFLAGS -Zinstrument-coverage"
+    # link to C++ from comment in f5098035eb1a14aa966c8651d88ea3d64323823d
+    export RUSTFLAGS="$RUSTFLAGS -Zinstrument-coverage -C link-arg=-lc++"
 fi
 
 # Add Rust libfuzzer flags.

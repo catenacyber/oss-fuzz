@@ -22,18 +22,26 @@
 ################################################################################
 
 export PATH="/rust/bin:$PATH"
+
 if [ "$SANITIZER" = "coverage" ] && [ $1 = "build" ]
 then
     crate_src_abspath=`cargo metadata --no-deps --format-version 1 | jq -r '.workspace_root'`
     export RUSTFLAGS="$RUSTFLAGS --remap-path-prefix src=$crate_src_abspath/src"
 fi
-#TODO investigate better than pwd
+
 if [ "$SANITIZER" = "coverage" ] && [ $1 = "fuzz" ]
 then
     fuzz_src_abspath=`pwd`
     export RUSTFLAGS="$RUSTFLAGS --remap-path-prefix fuzz_targets=$fuzz_src_abspath/fuzz_targets"
-    # hack to turn cargo fuzz build in cargo build so as not to have optimizations and still get coverage
-    cd fuzz && cargo build
+    # hack to turn cargo fuzz build into cargo build so as to get coverage
+    # cargo fuzz adds "--target" "x86_64-unknown-linux-gnu"
+    (
+    # go into fuzz directory if not already the case
+    cd fuzz || true
+    cargo build --release --bins
+    # link so that build script can find the built fuzz targets
+    ln -s . x86_64-unknown-linux-gnu
+    )
     exit 0
 fi
 

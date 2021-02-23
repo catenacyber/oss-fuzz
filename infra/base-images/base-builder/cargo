@@ -40,6 +40,7 @@ then
     cd fuzz || true
     cargo build --release --bins
     # link so that build script can find the built fuzz targets
+    cd target
     ln -s . x86_64-unknown-linux-gnu
     )
     exit 0

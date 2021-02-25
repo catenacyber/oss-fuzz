@@ -1,0 +1,10 @@
+homepage: "https://www.astropy.org"
+language: python
+primary_contact: "feedback@astropy.org"
+auto_ccs:
+  - "p.antoine@catenacyber.fr"
+fuzzing_engines:
+  - libfuzzer
+sanitizers:
+  - address
+main_repo: "https://github.com/astropy/astropy"

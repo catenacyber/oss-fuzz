@@ -1,0 +1,18 @@
+diff --git a/llvm/lib/ProfileData/Coverage/CoverageMappingReader.cpp b/llvm/lib/ProfileData/Coverage/CoverageMappingReader.cpp
+index 1acdcb4bebb9..b985ea11138d 100644
+--- a/llvm/lib/ProfileData/Coverage/CoverageMappingReader.cpp
++++ b/llvm/lib/ProfileData/Coverage/CoverageMappingReader.cpp
+@@ -544,8 +544,11 @@ class VersionedCovMapFuncRecordReader : public CovMapFuncRecordReader {
+       StringRef FuncName;
+       if (Error Err = CFR->template getFuncName<Endian>(ProfileNames, FuncName))
+         return Err;
+-      if (FuncName.empty())
+-        return make_error<InstrProfError>(instrprof_error::malformed);
++      if (FuncName.empty()) {
++       FuncName = "ossfuzz_llvm_rust_coverage_warning";
++       printf("function with hash %lx has no name", FuncHash);
++        //return make_error<InstrProfError>(instrprof_error::eof);
++      }
+       ++CovMapNumUsedRecords;
+       Records.emplace_back(Version, FuncName, FuncHash, Mapping,
+                            FileRange.StartingIndex, FileRange.Length);

@@ -93,6 +93,14 @@ fi
 git -C $LLVM_SRC checkout $LLVM_REVISION
 echo "Using LLVM revision: $LLVM_REVISION"
 
+(
+# patch to turn a llvm-cov error into a warning
+# this allows to have rust coverage for Suricata
+# cf https://github.com/google/oss-fuzz/pull/4697
+cd $LLVM_SRC
+git apply /root/patch_llvm_cov.diff
+)
+
 # Build & install.
 mkdir -p $WORK/llvm-stage2 $WORK/llvm-stage1
 python3 $SRC/chromium_tools/clang/scripts/update.py --output-dir $WORK/llvm-stage1

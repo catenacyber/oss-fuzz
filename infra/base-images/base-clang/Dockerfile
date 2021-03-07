@@ -28,6 +28,7 @@ RUN apt-get update && apt-get install -y wget sudo && \
     SUDO_FORCE_REMOVE=yes apt-get remove --purge -y wget sudo && \
     rm -rf /usr/local/doc/cmake /usr/local/bin/cmake-gui
 
+COPY patch_llvm_cov.diff /root/
 COPY checkout_build_install_llvm.sh /root/
 # Keep all steps in the same script to decrease the number of intermediate
 # layes in docker file.

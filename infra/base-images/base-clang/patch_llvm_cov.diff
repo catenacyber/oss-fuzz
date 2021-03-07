@@ -10,7 +10,7 @@ index 1acdcb4bebb9..b985ea11138d 100644
 -        return make_error<InstrProfError>(instrprof_error::malformed);
 +      if (FuncName.empty()) {
 +       FuncName = "ossfuzz_llvm_rust_coverage_warning";
-+       printf("function with hash %lx has no name", FuncHash);
++       fprintf(stderr, "function with hash %lx has no name\n", FuncHash);
 +        //return make_error<InstrProfError>(instrprof_error::eof);
 +      }
        ++CovMapNumUsedRecords;

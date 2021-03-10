@@ -2,20 +2,24 @@
 
 package snappy
 
+import (
+	"bytes"
+)
+
 func FuzzRoundTrip(data []byte) int {
 	encoded := Encode(nil, data)
-	decoded, err := snappy.Decode(nil, encoded)
+	decoded, err := Decode(nil, encoded)
 	if err != nil {
 		panic("Error decoding snappy-encoded")
 	}
-	if decoded != data {
+	if !bytes.Equal(data, decoded) {
 		panic("Different result on roundtrip encode/decode")
 	}
 	return 1
 }
 
 func FuzzDecode(data []byte) int {
-	_, err := snappy.Decode(nil, data)
+	_, err := Decode(nil, data)
 	if err != nil {
 		return 0
 	}

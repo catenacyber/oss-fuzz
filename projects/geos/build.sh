@@ -20,5 +20,5 @@ git apply ../patch.diff
 mkdir build
 cd build
 cmake -DBUILD_SHARED_LIBS=OFF ..
-make -j($nproc)
-cp fuzz* $OUT/
+make -j$(nproc)
+cp bin/fuzz* $OUT/

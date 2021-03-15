@@ -15,7 +15,8 @@
 ################################################################################
 
 FROM gcr.io/oss-fuzz-base/base-builder
-RUN apt-get update && apt-get install -y cmake libhdf5-serial-dev
+RUN apt-get update && apt-get install -y cmake libhdf5-serial-dev libcurl4-gnutls-dev m4
 RUN git clone --depth 1 https://github.com/Unidata/netcdf-c
 COPY build.sh $SRC
+COPY patch.diff $SRC
 WORKDIR $SRC/netcdf-c

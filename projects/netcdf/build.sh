@@ -16,6 +16,7 @@
 ################################################################################
 
 # build project
+git apply ../patch.diff
 mkdir build
 cd build
 cmake -DBUILD_SHARED_LIBS=OFF ..

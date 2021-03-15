@@ -20,3 +20,4 @@ RUN pip3 install PyOpenGL PySide2
 RUN git clone --depth 1 https://github.com/PixarAnimationStudios/USD
 WORKDIR $SRC/USD
 COPY build.sh $SRC
+RUN python3 build_scripts/build_usd.py /usr/local/USD

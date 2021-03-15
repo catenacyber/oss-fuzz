@@ -21,4 +21,4 @@ mkdir build
 cd build
 cmake -DBUILD_SHARED_LIBS=OFF ..
 make -j$(nproc)
-cp bin/fuzz* $OUT/
+cp fuzz/fuzz* $OUT/

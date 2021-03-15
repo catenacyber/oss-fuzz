@@ -19,7 +19,7 @@
 git apply ../patch.diff
 mkdir build && cd build
 # ugly hack as some file named core gets created
-cmake -DBUILD_TESTS=ON -DBUILD_SHARED_LIBS=OFF .. || { rm core && cmake -DBUILD_TESTS=ON -DBUILD_SHARED_LIBS=OFF ..; }
+cmake -DBUILD_SHARED_LIBS=OFF -DBUILD_DRSTATS=OFF -DBUILD_TOOLS=OFF -DBUILD_SAMPLES=OFF .. || { rm core && cmake -DBUILD_SHARED_LIBS=OFF -DBUILD_DRSTATS=OFF -DBUILD_TOOLS=OFF -DBUILD_SAMPLES=OFF ..; }
 make -j$(nproc)
 
-cp suite/tests/bin/fuzz* $OUT/
+cp bin/fuzz* $OUT/

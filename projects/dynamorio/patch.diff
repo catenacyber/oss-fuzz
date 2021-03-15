@@ -1,29 +1,50 @@
-diff --git a/suite/tests/CMakeLists.txt b/suite/tests/CMakeLists.txt
-index 60ed4b85..40736b28 100644
---- a/suite/tests/CMakeLists.txt
-+++ b/suite/tests/CMakeLists.txt
-@@ -4801,3 +4801,5 @@ if (NOT ANDROID AND AARCHXX)
-       PROPERTIES LABELS RUNS_ON_QEMU)
-   endif ()
- endif (NOT ANDROID AND AARCHXX)
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index a6aad7e9..4eabfab2 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -447,20 +447,6 @@ if ("${CMAKE_BUILD_TYPE}" STREQUAL "")
+   endif (DEBUG)
+ endif ()
+ string(TOUPPER "${CMAKE_BUILD_TYPE}" CMAKE_BUILD_TYPE_UPPER)
+-foreach (config ${CMAKE_BUILD_TYPE} ${CMAKE_CONFIGURATION_TYPES})
+-  string(TOUPPER "${config}" config_upper)
+-  foreach (var
+-      CMAKE_C_FLAGS_${config_upper};
+-      CMAKE_CXX_FLAGS_${config_upper};
+-      CMAKE_EXE_LINKER_FLAGS_${config_upper};
+-      CMAKE_MODULE_LINKER_FLAGS_${config_upper};
+-      CMAKE_SHARED_LINKER_FLAGS_${config_upper})
+-    set(${var} " ") # if "" defaults come back
+-  endforeach ()
+-endforeach ()
+-foreach (var CMAKE_C_FLAGS;CMAKE_CXX_FLAGS)
+-  set(${var} " ") # if "" defaults come back
+-endforeach ()
+ 
+ if (APPLE)
+   # Enable @rpath for all shared library install names.
+@@ -2018,3 +2004,5 @@ set(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "DynamoRIO")
+ set(CPACK_PACKAGE_RELOCATABLE "true")
+ 
+ include(CPack)
 +
 +add_subdirectory(fuzz)
-diff --git a/suite/tests/fuzz/CMakeLists.txt b/suite/tests/fuzz/CMakeLists.txt
+diff --git a/fuzz/CMakeLists.txt b/fuzz/CMakeLists.txt
 new file mode 100644
-index 00000000..9e611e0f
+index 00000000..e3b7b7c7
 --- /dev/null
-+++ b/suite/tests/fuzz/CMakeLists.txt
++++ b/fuzz/CMakeLists.txt
 @@ -0,0 +1,5 @@
 +if(DEFINED ENV{LIB_FUZZING_ENGINE})
 +  add_executable(fuzz_disassemble fuzz_disassemble.cc)
 +  configure_DynamoRIO_decoder(fuzz_disassemble)
-+  target_link_libraries(fuzz_disassemble $ENV{LIB_FUZZING_ENGINE})
++  target_link_libraries(fuzz_disassemble $ENV{LIB_FUZZING_ENGINE} pthread)
 +endif()
-diff --git a/suite/tests/fuzz/fuzz_disassemble.cc b/suite/tests/fuzz/fuzz_disassemble.cc
+diff --git a/fuzz/fuzz_disassemble.cc b/fuzz/fuzz_disassemble.cc
 new file mode 100644
 index 00000000..b7872ae5
 --- /dev/null
-+++ b/suite/tests/fuzz/fuzz_disassemble.cc
++++ b/fuzz/fuzz_disassemble.cc
 @@ -0,0 +1,31 @@
 +#include <fcntl.h>
 +

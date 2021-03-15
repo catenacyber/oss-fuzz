@@ -16,6 +16,7 @@
 
 FROM gcr.io/oss-fuzz-base/base-builder
 RUN apt-get update && apt-get install -y cmake
+RUN pip3 install PyOpenGL PySide2
 RUN git clone --depth 1 https://github.com/PixarAnimationStudios/USD
 WORKDIR $SRC
-COPY build.sh $SRC/
+COPY build.sh $SRC/USD

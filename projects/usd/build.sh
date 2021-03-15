@@ -16,4 +16,4 @@
 ################################################################################
 
 # build project
-python USD/build_scripts/build_usd.py /usr/local/USD
+python3 build_scripts/build_usd.py /usr/local/USD

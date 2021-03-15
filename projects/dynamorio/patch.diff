@@ -31,26 +31,27 @@ index a6aad7e9..4eabfab2 100644
 +add_subdirectory(fuzz)
 diff --git a/fuzz/CMakeLists.txt b/fuzz/CMakeLists.txt
 new file mode 100644
-index 00000000..e3b7b7c7
+index 00000000..9f597dde
 --- /dev/null
 +++ b/fuzz/CMakeLists.txt
-@@ -0,0 +1,5 @@
+@@ -0,0 +1,6 @@
 +if(DEFINED ENV{LIB_FUZZING_ENGINE})
 +  add_executable(fuzz_disassemble fuzz_disassemble.cc)
-+  configure_DynamoRIO_decoder(fuzz_disassemble)
++  configure_DynamoRIO_standalone(fuzz_disassemble)
++  target_include_directories(fuzz_disassemble PRIVATE ${CMAKE_BINARY_DIR}/include)
 +  target_link_libraries(fuzz_disassemble $ENV{LIB_FUZZING_ENGINE} pthread)
 +endif()
 diff --git a/fuzz/fuzz_disassemble.cc b/fuzz/fuzz_disassemble.cc
 new file mode 100644
-index 00000000..b7872ae5
+index 00000000..443538b2
 --- /dev/null
 +++ b/fuzz/fuzz_disassemble.cc
-@@ -0,0 +1,31 @@
+@@ -0,0 +1,29 @@
 +#include <fcntl.h>
++#include <stdint.h>
 +
 +#define DR_FAST_IR 1
 +#include "dr_api.h"
-+#include "droption.h"
 +
 +static int initialized = 0;
 +static int flog;
@@ -64,8 +65,6 @@ index 00000000..b7872ae5
 +    byte *pc = (byte *) Data;
 +    byte *stop_pc = (byte *) Data + Size;
 +    while (pc <= stop_pc) {
-+        // Check ahead of time to see whether this instruction enters the redzone
-+        // (or, we could disassemble into a buffer and check before printing it).
 +        if (pc + decode_sizeof(dcontext, pc, NULL _IF_X86_64(NULL)) > stop_pc) {
 +            break;
 +        }
@@ -77,3 +76,16 @@ index 00000000..b7872ae5
 +    return 0;
 +}
 +
+diff --git a/make/DynamoRIOConfig.cmake.in b/make/DynamoRIOConfig.cmake.in
+index 22c6252b..e30408ad 100755
+--- a/make/DynamoRIOConfig.cmake.in
++++ b/make/DynamoRIOConfig.cmake.in
+@@ -492,7 +492,7 @@ function (configure_DynamoRIO_global is_cxx change_flags)
+ 
+     configure_DynamoRIO_main_headers()
+ 
+-    if (change_flags)
++    if (change_flags AND NOT DEFINED ENV{LIB_FUZZING_ENGINE})
+       # Remove global C flags that are unsafe for a client library.
+       # Since CMake does not support removing flags on a per-target basis,
+       # we clear the base flags so we can add what we want to each target.

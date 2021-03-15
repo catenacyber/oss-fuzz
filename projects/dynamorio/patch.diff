@@ -1,0 +1,58 @@
+diff --git a/suite/tests/CMakeLists.txt b/suite/tests/CMakeLists.txt
+index 60ed4b85..40736b28 100644
+--- a/suite/tests/CMakeLists.txt
++++ b/suite/tests/CMakeLists.txt
+@@ -4801,3 +4801,5 @@ if (NOT ANDROID AND AARCHXX)
+       PROPERTIES LABELS RUNS_ON_QEMU)
+   endif ()
+ endif (NOT ANDROID AND AARCHXX)
++
++add_subdirectory(fuzz)
+diff --git a/suite/tests/fuzz/CMakeLists.txt b/suite/tests/fuzz/CMakeLists.txt
+new file mode 100644
+index 00000000..9e611e0f
+--- /dev/null
++++ b/suite/tests/fuzz/CMakeLists.txt
+@@ -0,0 +1,5 @@
++if(DEFINED ENV{LIB_FUZZING_ENGINE})
++  add_executable(fuzz_disassemble fuzz_disassemble.cc)
++  configure_DynamoRIO_decoder(fuzz_disassemble)
++  target_link_libraries(fuzz_disassemble $ENV{LIB_FUZZING_ENGINE})
++endif()
+diff --git a/suite/tests/fuzz/fuzz_disassemble.cc b/suite/tests/fuzz/fuzz_disassemble.cc
+new file mode 100644
+index 00000000..b7872ae5
+--- /dev/null
++++ b/suite/tests/fuzz/fuzz_disassemble.cc
+@@ -0,0 +1,31 @@
++#include <fcntl.h>
++
++#define DR_FAST_IR 1
++#include "dr_api.h"
++#include "droption.h"
++
++static int initialized = 0;
++static int flog;
++
++extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
++    if (initialized == 0) {
++        flog = open("/dev/null", 0);
++        initialized = 1;
++    }
++    void *dcontext = GLOBAL_DCONTEXT;
++    byte *pc = (byte *) Data;
++    byte *stop_pc = (byte *) Data + Size;
++    while (pc <= stop_pc) {
++        // Check ahead of time to see whether this instruction enters the redzone
++        // (or, we could disassemble into a buffer and check before printing it).
++        if (pc + decode_sizeof(dcontext, pc, NULL _IF_X86_64(NULL)) > stop_pc) {
++            break;
++        }
++        pc = disassemble_with_info(dcontext, pc, flog, false, true);
++        if (pc == NULL) {
++            break;
++        }
++    }
++    return 0;
++}
++

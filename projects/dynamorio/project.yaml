@@ -1,0 +1,10 @@
+homepage: "https://dynamorio.org"
+language: c++
+primary_contact: "bruening@google.com"
+auto_ccs :
+- "p.antoine@catenacyber.fr"
+
+sanitizers:
+- address
+- undefined
+main_repo: 'https://github.com/DynamoRIO/dynamorio'

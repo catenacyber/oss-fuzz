@@ -15,6 +15,14 @@
 #
 ################################################################################
 
+(
+cd ../ign-cmake
+mkdir build
+cd build
+cmake ..
+make -j$(nproc) install
+)
+
 git apply ../patch.diff
 mkdir build
 cd build

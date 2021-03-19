@@ -15,8 +15,10 @@
 ################################################################################
 
 FROM gcr.io/oss-fuzz-base/base-builder
-RUN apt-get update && apt-get install -y cmake libtinyxml2-dev pkg-config ruby
-RUN git clone https://github.com/ignitionrobotics/ign-cmake
+RUN apt-get update && apt-get install -y cmake libtinyxml2-dev pkg-config ruby wget
+RUN echo "deb http://packages.osrfoundation.org/gazebo/ubuntu-stable `lsb_release -cs` main" > /etc/apt/sources.list.d/gazebo-stable.list
+RUN wget http://packages.osrfoundation.org/gazebo.key -O - | apt-key add -
+RUN apt-get update && apt-get install -y libignition-math6-dev libignition-utils1-dev libignition-cmake2-dev
 RUN git clone --depth 1 https://github.com/osrf/sdformat.git
 COPY build.sh $SRC/
 COPY patch.diff $SRC/

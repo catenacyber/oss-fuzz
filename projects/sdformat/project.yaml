@@ -1,0 +1,9 @@
+homepage: "https://sdformat.org"
+main_repo: "https://github.com/osrf/sdformat.git"
+language: c++
+primary_contact: "nate@osrfoundation.org"
+auto_ccs:
+  - "p.antoine@catenacyber.fr"
+sanitizers:
+  - address
+  - undefined

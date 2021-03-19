@@ -1,0 +1,14 @@
+diff --git a/examples/CMakeLists.txt b/examples/CMakeLists.txt
+index 07d02a83..89f6e0e4 100644
+--- a/examples/CMakeLists.txt
++++ b/examples/CMakeLists.txt
+@@ -12,3 +12,8 @@ target_link_libraries(simple ${SDFormat_LIBRARIES})
+ 
+ add_executable(dom dom.cc)
+ target_link_libraries(dom ${SDFormat_LIBRARIES})
++
++if(DEFINED ENV{LIB_FUZZING_ENGINE})
++  add_executable(fuzz_loadsdfstring fuzz_loadsdfstring.cc)
++  target_link_libraries(fuzz_loadsdfstring ${SDFormat_LIBRARIES} $ENV{LIB_FUZZING_ENGINE})
++endif()
+\ No newline at end of file

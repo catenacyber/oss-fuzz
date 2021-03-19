@@ -21,6 +21,18 @@ mkdir build
 cd build
 cmake ..
 make -j$(nproc) install
+
+cd ../ign-utils
+mkdir build
+cd build
+cmake ..
+make -j$(nproc) install
+
+cd ../ign-math
+mkdir build
+cd build
+cmake ..
+make -j$(nproc) install
 )
 
 git apply ../patch.diff

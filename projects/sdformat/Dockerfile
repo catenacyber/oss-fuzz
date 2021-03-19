@@ -15,7 +15,8 @@
 ################################################################################
 
 FROM gcr.io/oss-fuzz-base/base-builder
-RUN apt-get update && apt-get install -y cmake libtinyxml2-dev pkg-config ruby
+RUN apt-get update && apt-get install -y cmake pkg-config ruby make autoconf automake libtool
+RUN git clone --depth 1 https://github.com/leethomason/tinyxml2
 RUN git clone --depth 1 https://github.com/ignitionrobotics/ign-cmake
 RUN git clone --depth 1 https://github.com/ignitionrobotics/ign-utils
 RUN git clone --depth 1 https://github.com/ignitionrobotics/ign-math

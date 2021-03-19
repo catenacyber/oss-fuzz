@@ -19,19 +19,24 @@
 cd ../ign-cmake
 mkdir build
 cd build
-cmake ..
+cmake .. -DBUILD_SHARED_LIBS=OFF
 make -j$(nproc) install
 
-cd ../ign-utils
+cd ../../ign-utils
 mkdir build
 cd build
-cmake ..
+cmake .. -DBUILD_SHARED_LIBS=OFF
 make -j$(nproc) install
 
-cd ../ign-math
+cd ../../ign-math
 mkdir build
 cd build
-cmake ..
+cmake .. -DBUILD_SHARED_LIBS=OFF
+make -j$(nproc) install
+)
+
+(
+cd ../tinyxml2
 make -j$(nproc) install
 )
 

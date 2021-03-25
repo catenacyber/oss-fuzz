@@ -1,5 +1,5 @@
 diff --git a/test/CMakeLists.txt b/test/CMakeLists.txt
-index 300718a2a..8b5cb62c7 100644
+index 300718a2a..e2e38ba00 100644
 --- a/test/CMakeLists.txt
 +++ b/test/CMakeLists.txt
 @@ -303,3 +303,13 @@ if(TEST_DEPICTION AND UNIX)
@@ -9,16 +9,16 @@ index 300718a2a..8b5cb62c7 100644
 +
 +if(DEFINED ENV{LIB_FUZZING_ENGINE})
 +  add_executable(fuzz_obconversion_smiles fuzz/fuzz_obconversion.cpp)
-+  target_compile_definitions(fuzz_obconversion_smiles PRIVATE -DFUZZ_INPUT_FORMAT=""SMILES"")
++  target_compile_definitions(fuzz_obconversion_smiles PRIVATE -DFUZZ_INPUT_FORMAT="SMILES")
 +  target_link_libraries(fuzz_obconversion_smiles ${libs} $ENV{LIB_FUZZING_ENGINE})
 +
 +  add_executable(fuzz_obconversion_sdf fuzz/fuzz_obconversion.cpp)
-+  target_compile_definitions(fuzz_obconversion_sdf PRIVATE -DFUZZ_INPUT_FORMAT=""SDF"")
++  target_compile_definitions(fuzz_obconversion_sdf PRIVATE -DFUZZ_INPUT_FORMAT="SDF")
 +  target_link_libraries(fuzz_obconversion_sdf ${libs} $ENV{LIB_FUZZING_ENGINE})
 +endif()
 diff --git a/test/fuzz/fuzz_obconversion.cpp b/test/fuzz/fuzz_obconversion.cpp
 new file mode 100644
-index 000000000..384969956
+index 000000000..43a68095e
 --- /dev/null
 +++ b/test/fuzz/fuzz_obconversion.cpp
 @@ -0,0 +1,29 @@
@@ -45,7 +45,7 @@ index 000000000..384969956
 +
 +    //FUZZ_INPUT_FORMAT is defined at compile time
 +    if(!obconv.SetInFormat(FUZZ_INPUT_FORMAT)){
-+        continue;
++        abort();
 +    }
 +    obconv.ReadString(&obmol, str);
 +    return 0;

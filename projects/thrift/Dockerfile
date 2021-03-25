@@ -19,4 +19,3 @@ RUN apt-get update && apt-get install -y libssl-dev pkg-config autoconf automake
 RUN git clone --depth 1 https://github.com/apache/thrift
 WORKDIR $SRC/thrift
 COPY build.sh $SRC/
-COPY fuzz.go $SRC/

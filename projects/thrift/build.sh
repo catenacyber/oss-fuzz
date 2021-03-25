@@ -17,22 +17,13 @@
 
 # build project
 export ASAN_OPTIONS=detect_leaks=0
-go mod init github.com/apache/thrift
 
 ./bootstrap.sh
 ./configure
 make -j$(nproc)
 make install
-(cd lib/go/thrift && go mod init github.com/apache/thrift/lib/go/thrift)
 
-mkdir fuzzgo
-cd fuzzgo
-thrift -r --gen go ../tutorial/tutorial.thrift
-cp $SRC/fuzz.go .
-go mod init thriftfuzz
-(cd ./gen-go/shared && go mod init shared)
-go mod edit -replace shared=./gen-go/shared
-(cd ./gen-go/tutorial && go mod init tutorial)
-go mod edit -replace tutorial=./gen-go/tutorial
-go mod edit -replace github.com/apache/thrift/lib/go/thrift=../lib/go/thrift
+cd lib/go/test/fuzz
+thrift -r --gen go ../../../../tutorial/tutorial.thrift
+go mod edit -replace github.com/apache/thrift/lib/go/thrift=../../thrift
 compile_go_fuzzer . Fuzz fuzz_go_tutorial

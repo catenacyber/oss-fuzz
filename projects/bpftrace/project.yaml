@@ -1,0 +1,10 @@
+homepage: "https://github.com/iovisor/bpftrace"
+language: c++
+primary_contact: "m.misono760@gmail.com"
+auto_ccs :
+- "p.antoine@catenacyber.fr"
+
+sanitizers:
+- address
+- undefined
+main_repo: 'https://github.com/iovisor/bpftrace'

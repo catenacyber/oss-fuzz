@@ -17,5 +17,9 @@
 
 # build project
 git apply ../../patch.diff
-./tools/build.py --no-goma -j$(nproc) -m debug -a x64 --sanitizer=asan dart_libfuzzer
+if [ "$SANITIZER" = "coverage" ]; then
+    ./tools/build.py --no-goma -j$(nproc) -m debug -a x64 --sanitizer=none --code-coverage dart_libfuzzer
+else
+    ./tools/build.py --no-goma -j$(nproc) -m debug -a x64 --sanitizer=asan dart_libfuzzer
+fi
 cp out/DebugASANX64/*fuzzer $OUT/

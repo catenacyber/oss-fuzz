@@ -7,6 +7,7 @@ DEFINE_PROTO_FUZZER(const perftools::profiles::Profile& input) {
     size_t size = input.ByteSizeLong();
     if (size > 0) {
         uint8_t *buffer = (uint8_t *) malloc(size);
+        printf("lol %d: %s\n", size, input.DebugString());
         input.SerializeToArray((uint8_t *) buffer, size);
         LPMFuzzerTestOneInput(buffer, size);
         free(buffer);

@@ -1,8 +1,8 @@
 diff --git a/llvm/lib/DebugInfo/Symbolize/CMakeLists.txt b/llvm/lib/DebugInfo/Symbolize/CMakeLists.txt
-index acfb3bd0e1ad..36cc129c24b0 100644
+index acfb3bd0e..5c4cf9763 100644
 --- a/llvm/lib/DebugInfo/Symbolize/CMakeLists.txt
 +++ b/llvm/lib/DebugInfo/Symbolize/CMakeLists.txt
-@@ -12,4 +12,7 @@ add_llvm_component_library(LLVMSymbolize
+@@ -12,4 +12,12 @@ add_llvm_component_library(LLVMSymbolize
    Object
    Support
    Demangle

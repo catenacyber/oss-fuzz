@@ -3,7 +3,7 @@
 
 extern "C" void  LPMFuzzerTestOneInput(const uint8_t *buffer, size_t size);
 
-DEFINE_PROTO_FUZZER(const openapi::v2::Document& input) {
+DEFINE_PROTO_FUZZER(const celgolpm::FuzVariables& input) {
     size_t size = input.ByteSizeLong();
     if (size > 0) {
         uint8_t *buffer = (uint8_t *) malloc(size);

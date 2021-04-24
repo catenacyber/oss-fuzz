@@ -7,33 +7,33 @@ import (
 )
 
 func FuzzEval(data []byte) int {
-	d := &FuzzVariables{}
+	gen := &FuzzVariables{}
 	err := proto.Unmarshal(data, d)
 	if err != nil {
 		panic("Failed to unmarshal LPM generated variables")
 	}
 
-	for k, _ := range FuzzVariables.Inputs {
+env, err := NewEnv()
+if err != nil {
+panic("impossible to create env")
+}
+	for k, _ := range gen.Inputs {
 		env, err = env.Extend(decls.NewVar(k, decls.String))
 		if err != nil {
 			panic("impossible to extend env")
 		}
 	}
 
-	env, err := NewEnv()
-	if err != nil {
-		panic("impossible to create env")
-	}
-	ast, issues := env.Compile(FuzzVariables.Expr)
+	ast, issues := env.Compile(gen.Expr)
 	if issues != nil && issues.Err() != nil {
 		return 0
 	}
-	_, err = env.Program(ast)
+	prg, err = env.Program(ast)
 	if err != nil {
 		panic("impossible to create prog from ast")
 	}
 
-	_, _, err := prg.Eval(FuzzVariables.Inputs)
+	_, _, err = prg.Eval(gen.Inputs)
 
 	return 1
 }

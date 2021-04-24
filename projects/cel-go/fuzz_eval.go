@@ -18,7 +18,7 @@ func FuzzEval(data []byte) int {
 		panic("impossible to create env")
 	}
 	for k, _ := range gen.Inputs {
-		env, err = env.Extend(Decalarations(decls.NewVar(k, decls.String)))
+		env, err = env.Extend(Declarations(decls.NewVar(k, decls.String)))
 		if err != nil {
 			panic("impossible to extend env")
 		}

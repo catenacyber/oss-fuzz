@@ -27,7 +27,7 @@ sed -i -e 's/LLVMFuzzerTestOneInput/LPMFuzzerTestOneInput/' main.go
 go build
 )
 
-$SRC/LPM/external.protobuf/bin/protoc --go_out=fuzzlpm/ I$SRC/ $SRC/cel-go-lpm.proto
+$SRC/LPM/external.protobuf/bin/protoc --go_out=fuzzlpm/ -I$SRC/ $SRC/cel-go-lpm.proto
 cp fuzzlpm/github.com/google/cel-go/cel/*.pb.go cel/
 
 $SRC/go114-fuzz-build/go114-fuzz-build -func FuzzEval -o fuzz_lpm.a github.com/google/cel-go/cel

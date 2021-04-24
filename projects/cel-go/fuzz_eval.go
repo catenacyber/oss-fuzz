@@ -1,6 +1,7 @@
 package cel
 
 import (
+"fmt"
 	"github.com/golang/protobuf/proto"
 
 	"github.com/google/cel-go/checker/decls"
@@ -32,6 +33,7 @@ func FuzzEval(data []byte) int {
 	if err != nil {
 		panic("impossible to create prog from ast")
 	}
+fmt.Printf("loltry %#+v\n", gen)
 
 	_, _, err = prg.Eval(gen.Inputs)
 

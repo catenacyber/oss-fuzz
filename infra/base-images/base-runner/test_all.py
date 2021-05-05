@@ -92,7 +92,9 @@ def find_fuzz_targets(directory, fuzzing_language):
     if os.getenv('FUZZING_ENGINE') != 'none':
       with open(path, 'rb') as file_handle:
         binary_contents = file_handle.read()
-        if b'LLVMFuzzerTestOneInput' not in binary_contents:
+        if os.getenv('FUZZING_ENGINE') == 'afl' and fuzzing_language == 'rust' and b'afl_persistent_loop' in binary_contents:
+            # this looks like a afl/rust fuzz target
+        else if b'LLVMFuzzerTestOneInput' not in binary_contents:
           continue
     fuzz_targets.append(path)
   return fuzz_targets

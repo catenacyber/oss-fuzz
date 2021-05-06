@@ -15,9 +15,16 @@
 ################################################################################
 FROM gcr.io/oss-fuzz-base/base-builder
 
-RUN git clone --depth 1 https://github.com/tikv/tikv.git
+# TODO move to base-image
+RUN cargo install honggfuzz
+RUN cargo install afl
+RUN apt update && apt install -y build-essential binutils-dev libunwind-dev libblocksruntime-dev liblzma-dev
+
+#TODO back to main repo
+RUN git clone --depth 1 --branch ossfuzz https://github.com/catenacyber/tikv.git
 
 COPY build.sh $SRC/
-COPY patch.diff $SRC/
+
+RUN cd $SRC/tikv/fuzz && ln -s fuzzer-libfuzzer fuzz
 
 WORKDIR $SRC/tikv

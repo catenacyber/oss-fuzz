@@ -6,5 +6,7 @@ sanitizers:
   - address
 fuzzing_engines:
   - libfuzzer
+  - afl
+  - honggfuzz
 language: rust
 main_repo: 'https://github.com/tikv/tikv.git'

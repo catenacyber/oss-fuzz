@@ -15,9 +15,17 @@
 #
 ################################################################################
 
-git apply $SRC/patch.diff
 cd fuzz
-RUSTFLAGS="" cargo run -- list-targets | while read t; do
-    RUSTFLAGS="" cargo run -- run $FUZZING_ENGINE ${t}
-    cp ../target/x86_64-unknown-linux-gnu/debug/${t} $OUT/
+RUSTFLAGS="" cargo build
+./target/debug/fuzz list-targets | while read t; do
+    if [ "$FUZZING_ENGINE" = honggfuzz ]; then
+        CFLAGS="" CXXFLAGS="" ./target/debug/fuzz build $FUZZING_ENGINE ${t}
+    fi
+    if [ "$FUZZING_ENGINE" = afl ]; then
+        CC=clang CXX=clang++ RUSTFLAGS="" ./target/debug/fuzz build $FUZZING_ENGINE ${t}
+    fi
+    if [ "$FUZZING_ENGINE" = libfuzzer ]; then
+        ./target/debug/fuzz build $FUZZING_ENGINE ${t}
+    fi
+    find target/ -name ${t} -type f | while read i; do cp $i $OUT/; done
 done

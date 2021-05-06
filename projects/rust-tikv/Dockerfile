@@ -26,5 +26,6 @@ RUN git clone --depth 1 --branch ossfuzz https://github.com/catenacyber/tikv.git
 COPY build.sh $SRC/
 
 RUN cd $SRC/tikv/fuzz && ln -s fuzzer-libfuzzer fuzz
+RUN cd fuzz && cargo build
 
 WORKDIR $SRC/tikv

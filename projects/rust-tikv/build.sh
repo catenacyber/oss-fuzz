@@ -16,7 +16,6 @@
 ################################################################################
 
 cd fuzz
-RUSTFLAGS="" cargo build
 ../target/debug/fuzz list-targets | while read t; do
     if [ "$FUZZING_ENGINE" = honggfuzz ]; then
         CFLAGS="" CXXFLAGS="" ../target/debug/fuzz build $FUZZING_ENGINE ${t}

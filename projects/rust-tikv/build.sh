@@ -17,15 +17,15 @@
 
 cd fuzz
 RUSTFLAGS="" cargo build
-./target/debug/fuzz list-targets | while read t; do
+../target/debug/fuzz list-targets | while read t; do
     if [ "$FUZZING_ENGINE" = honggfuzz ]; then
-        CFLAGS="" CXXFLAGS="" ./target/debug/fuzz build $FUZZING_ENGINE ${t}
+        CFLAGS="" CXXFLAGS="" ../target/debug/fuzz build $FUZZING_ENGINE ${t}
     fi
     if [ "$FUZZING_ENGINE" = afl ]; then
-        CC=clang CXX=clang++ RUSTFLAGS="" ./target/debug/fuzz build $FUZZING_ENGINE ${t}
+        CC=clang CXX=clang++ RUSTFLAGS="" ../target/debug/fuzz build $FUZZING_ENGINE ${t}
     fi
     if [ "$FUZZING_ENGINE" = libfuzzer ]; then
-        ./target/debug/fuzz build $FUZZING_ENGINE ${t}
+        ../target/debug/fuzz build $FUZZING_ENGINE ${t}
     fi
     find target/ -name ${t} -type f | while read i; do cp $i $OUT/; done
 done

@@ -26,5 +26,5 @@ cd fuzz
     if [ "$FUZZING_ENGINE" = libfuzzer ]; then
         ../target/debug/fuzz build $FUZZING_ENGINE ${t}
     fi
-    find target/ -name ${t} -type f | while read i; do cp $i $OUT/; done
+    find ../target/ -name ${t} -type f | while read i; do cp $i $OUT/; done
 done

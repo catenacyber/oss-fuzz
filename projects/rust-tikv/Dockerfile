@@ -23,7 +23,6 @@ RUN apt update && apt install -y build-essential binutils-dev libunwind-dev libb
 #TODO back to main repo
 RUN git clone --depth 1 --branch ossfuzz https://github.com/catenacyber/tikv.git
 
-RUN cd $SRC/tikv/fuzz && ln -s fuzzer-libfuzzer fuzz
 RUN cd $SRC/tikv/fuzz && cargo build
 
 RUN cargo install --force afl

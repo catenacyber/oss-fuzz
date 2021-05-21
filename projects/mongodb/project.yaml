@@ -1,0 +1,7 @@
+homepage: "https://www.mongodb.com/"
+language: c++
+primary_contact: "bcaimano@gmail.com"
+auto_ccs:
+- "p.antoine@catenacyber.fr"
+
+main_repo: 'https://github.com/mongodb/mongo.git'

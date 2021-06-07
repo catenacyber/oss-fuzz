@@ -31,7 +31,7 @@ make -j$(nproc)
 
 $CC $CFLAGS -I. -Icups -c $SRC/fuzzippread.c -o fuzzippread.o
 $CXX $CXXFLAGS fuzzippread.o -o fuzzippread \
-    libcups.a $LIB_FUZZING_ENGINE
+    cups/libcups.a $LIB_FUZZING_ENGINE
 
 patchelf --set-rpath '$ORIGIN/lib' fuzzippread
 ldd fuzzippread | grep /lib/x86_64-linux-gnu/ | awk '{print $1}' | while read l; do

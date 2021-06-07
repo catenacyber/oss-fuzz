@@ -1,0 +1,10 @@
+homepage: "https://tartiflette.io/"
+language: python
+primary_contact: "maximilien.raulic@gmail.com"
+auto_ccs:
+  - "p.antoine@catenacyber.fr"
+fuzzing_engines:
+  - libfuzzer
+sanitizers:
+  - address
+main_repo: "https://github.com/tartiflette/tartiflette"

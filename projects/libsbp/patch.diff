@@ -36,7 +36,7 @@ index 00000000..87f32bec
 +target_link_libraries(fuzz_sbp_process sbp $ENV{LIB_FUZZING_ENGINE})
 diff --git a/c/fuzz/fuzz_sbp_process.c b/c/fuzz/fuzz_sbp_process.c
 new file mode 100644
-index 00000000..1f5248f7
+index 00000000..b0c71ef7
 --- /dev/null
 +++ b/c/fuzz/fuzz_sbp_process.c
 @@ -0,0 +1,55 @@
@@ -55,7 +55,7 @@ index 00000000..1f5248f7
 +  (void)sender_id, (void)len, (void)msg, (void)context;
 +}
 +
-+void pos_llh_cov_callback(u16 /*sender_id*/, u8 /*len*/, u8 msg[], void* /*context*/) {
++void pos_llh_cov_callback(u16 sender_id, u8 len, u8 msg[], void *context) {
 +    (void)sender_id, (void)len, (void)msg, (void)context;
 +}
 +const uint8_t *fuzzedData;

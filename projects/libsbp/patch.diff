@@ -36,7 +36,7 @@ index 00000000..87f32bec
 +target_link_libraries(fuzz_sbp_process sbp $ENV{LIB_FUZZING_ENGINE})
 diff --git a/c/fuzz/fuzz_sbp_process.c b/c/fuzz/fuzz_sbp_process.c
 new file mode 100644
-index 00000000..b0c71ef7
+index 00000000..6708f3ba
 --- /dev/null
 +++ b/c/fuzz/fuzz_sbp_process.c
 @@ -0,0 +1,55 @@
@@ -85,7 +85,7 @@ index 00000000..b0c71ef7
 +  sbp_state_init(&s);
 +
 +  sbp_register_callback(&s, SBP_MSG_HEARTBEAT, &heartbeat_callback, NULL,
-+                        &&callback_node[0]);
++                        &callback_node[0]);
 +  sbp_register_callback(&s, SBP_MSG_POS_LLH_COV, &pos_llh_cov_callback, NULL, &callback_node[1]);
 +
 +

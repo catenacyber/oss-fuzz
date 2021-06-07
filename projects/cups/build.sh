@@ -29,8 +29,7 @@ export LDFLAGS=$CXXFLAGS
 ./configure --with-dnssd=no
 make -j$(nproc)
 
-cd cups
-$CC $CFLAGS -c $SRC/fuzzippread.c -o fuzzippread.o
+$CC $CFLAGS -I. -Icups -c $SRC/fuzzippread.c -o fuzzippread.o
 $CXX $CXXFLAGS fuzzippread.o -o fuzzippread \
     libcups.a $LIB_FUZZING_ENGINE
 

@@ -26,15 +26,11 @@ mkdir -p $OUT/lib
 
 # build project
 export LDFLAGS=$CXXFLAGS
-./configure --with-dnssd=no
+./configure --with-dnssd=no --with-tls=no
 make -j$(nproc)
 
 $CC $CFLAGS -I. -Icups -c $SRC/fuzzippread.c -o fuzzippread.o
 $CXX $CXXFLAGS fuzzippread.o -o fuzzippread \
-    cups/libcups.a $LIB_FUZZING_ENGINE
+    cups/libcups.a $LIB_FUZZING_ENGINE -lz
 
-patchelf --set-rpath '$ORIGIN/lib' fuzzippread
-ldd fuzzippread | grep /lib/x86_64-linux-gnu/ | awk '{print $1}' | while read l; do
-    copy_lib fuzzippread ${l}
-done
 cp fuzzippread $OUT/

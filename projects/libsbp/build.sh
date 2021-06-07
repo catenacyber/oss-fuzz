@@ -20,6 +20,6 @@ git apply $SRC/patch.diff
 cd c
 mkdir build
 cd build
-cmake .. -DBUILD_TESTS=OFF
+cmake .. -DBUILD_TESTING=OFF
 make -j$(nproc)
 cp fuzz/fuzz* $OUT/

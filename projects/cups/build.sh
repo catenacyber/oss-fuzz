@@ -25,12 +25,14 @@ function copy_lib
 mkdir -p $OUT/lib
 
 # build project
-git apply $SRC/patch.diff
 export LDFLAGS=$CXXFLAGS
 ./configure --with-dnssd=no
 make -j$(nproc)
+
 cd cups
-make fuzzippread
+$CC $CFLAGS -c $SRC/fuzzippread.c -o fuzzippread.o
+$CXX $CXXFLAGS fuzzippread.o -o fuzzippread \
+    libcups.a $LIB_FUZZING_ENGINE
 
 patchelf --set-rpath '$ORIGIN/lib' fuzzippread
 ldd fuzzippread | grep /lib/x86_64-linux-gnu/ | awk '{print $1}' | while read l; do

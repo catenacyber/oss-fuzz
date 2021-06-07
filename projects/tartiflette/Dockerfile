@@ -15,7 +15,7 @@
 ################################################################################
 
 FROM gcr.io/oss-fuzz-base/base-builder
-RUN git clone --depth 1 https://github.com/tartiflette/tartiflette
+RUN git clone --recursive --depth 1 https://github.com/tartiflette/tartiflette
 WORKDIR $SRC/tartiflette
 COPY build.sh $SRC/
 COPY fuzz_* $SRC/

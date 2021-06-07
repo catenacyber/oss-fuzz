@@ -16,8 +16,8 @@
 
 import atheris
 
-import yaml
-
+from tartiflette.sdl.builder import build_graphql_schema_from_sdl
+from tartiflette.sdl.schema import GraphQLSchema
 
 def TestOneInput(input_bytes):
   try:

@@ -1,0 +1,6 @@
+homepage: "https://swift-nav.github.io/libsbp/"
+language: c++
+primary_contact: "mark.fine@gmail.com"
+auto_ccs:
+- "p.antoine@catenacyber.fr"
+main_repo: 'https://github.com/swift-nav/libsbp'

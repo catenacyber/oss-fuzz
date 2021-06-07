@@ -1,0 +1,107 @@
+diff --git a/c/CMakeLists.txt b/c/CMakeLists.txt
+index ceb275db..9dd0b6db 100644
+--- a/c/CMakeLists.txt
++++ b/c/CMakeLists.txt
+@@ -33,4 +33,7 @@ endif()
+ if(libsbp_BUILD_TESTS)
+   add_subdirectory(test)
+ endif()
++if(DEFINED ENV{LIB_FUZZING_ENGINE})
++  add_subdirectory(fuzz)
++endif()
+ add_subdirectory(examples)
+diff --git a/c/fuzz/CMakeLists.txt b/c/fuzz/CMakeLists.txt
+new file mode 100644
+index 00000000..87f32bec
+--- /dev/null
++++ b/c/fuzz/CMakeLists.txt
+@@ -0,0 +1,18 @@
++cmake_minimum_required(VERSION 2.8.9)
++project(fuzz_sbp_process)
++
++set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
++
++set(CMAKE_C_FLAGS "-Wall -Werror -std=gnu99 ${CMAKE_C_FLAGS}")
++
++add_executable(fuzz_sbp_process fuzz_sbp_process.c)
++
++find_package(PkgConfig)
++pkg_check_modules(LIBSERIALPORT libserialport)
++link_directories(${LIBSERIALPORT_LIBRARY_DIRS})
++include_directories(${LIBSERIALPORT_INCLUDE_DIRS})
++
++link_directories("/usr/local/lib/")
++include_directories("/usr/local/include/")
++
++target_link_libraries(fuzz_sbp_process sbp $ENV{LIB_FUZZING_ENGINE})
+diff --git a/c/fuzz/fuzz_sbp_process.c b/c/fuzz/fuzz_sbp_process.c
+new file mode 100644
+index 00000000..45194ee0
+--- /dev/null
++++ b/c/fuzz/fuzz_sbp_process.c
+@@ -0,0 +1,51 @@
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <unistd.h>
++
++#include <libsbp/sbp.h>
++#include <libsbp/system.h>
++
++static sbp_msg_callbacks_node_t heartbeat_callback_node;
++
++void heartbeat_callback(u16 sender_id, u8 len, u8 msg[], void *context)
++{
++  (void)sender_id, (void)len, (void)msg, (void)context;
++  fprintf(stdout, "%s\n", __FUNCTION__);
++}
++
++const uint8_t *fuzzedData;
++size_t fuzzedSize;
++size_t fuzzedOffset;
++
++s32 fuzz_read(u8 *buff, u32 n, void *context)
++{
++  (void)context;
++
++  if (fuzzedOffset + n > fuzzedSize) {
++    fuzzedOffset = fuzzedSize;
++    return -1;
++  }
++  memcpy(buff, fuzzedData + fuzzedOffset, n);
++  fuzzedOffset += n;
++  return n;
++}
++
++int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
++
++  fuzzedSize = Size;
++  fuzzedData = Data;
++  fuzzedOffset = 0;
++
++  sbp_state_t s;
++  sbp_state_init(&s);
++
++  sbp_register_callback(&s, SBP_MSG_HEARTBEAT, &heartbeat_callback, NULL,
++                        &heartbeat_callback_node);
++
++  while(fuzzedOffset < fuzzedSize) {
++    sbp_process(&s, &fuzz_read);
++  }
++
++  return 0;
++}
+diff --git a/c/src/sbp.c b/c/src/sbp.c
+index c67c3c30..34f2ee3f 100644
+--- a/c/src/sbp.c
++++ b/c/src/sbp.c
+@@ -541,6 +541,9 @@ s8 sbp_process(sbp_state_t *s, s32 (*read)(u8 *buff, u32 n, void *context))
+       crc = crc16_ccitt((u8*)&(s->sender_id), sizeof(s->sender_id), crc);
+       crc = crc16_ccitt(&(s->msg_len), sizeof(s->msg_len), crc);
+       crc = crc16_ccitt(SBP_FRAME_MSG_PAYLOAD(s->frame_buff), s->msg_len, crc);
++#ifdef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
++      crc = s->crc;
++#endif
+       if (s->crc == crc) {
+         /* Message complete, process frame callbacks and payload callbacks. */
+         ret = sbp_process_frame(s, s->sender_id, s->msg_type,

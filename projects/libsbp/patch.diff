@@ -36,10 +36,10 @@ index 00000000..87f32bec
 +target_link_libraries(fuzz_sbp_process sbp $ENV{LIB_FUZZING_ENGINE})
 diff --git a/c/fuzz/fuzz_sbp_process.c b/c/fuzz/fuzz_sbp_process.c
 new file mode 100644
-index 00000000..45194ee0
+index 00000000..1f5248f7
 --- /dev/null
 +++ b/c/fuzz/fuzz_sbp_process.c
-@@ -0,0 +1,51 @@
+@@ -0,0 +1,55 @@
 +#include <stdio.h>
 +#include <stdlib.h>
 +#include <string.h>
@@ -48,14 +48,16 @@ index 00000000..45194ee0
 +#include <libsbp/sbp.h>
 +#include <libsbp/system.h>
 +
-+static sbp_msg_callbacks_node_t heartbeat_callback_node;
++static sbp_msg_callbacks_node_t callback_node[2];
 +
 +void heartbeat_callback(u16 sender_id, u8 len, u8 msg[], void *context)
 +{
 +  (void)sender_id, (void)len, (void)msg, (void)context;
-+  fprintf(stdout, "%s\n", __FUNCTION__);
 +}
 +
++void pos_llh_cov_callback(u16 /*sender_id*/, u8 /*len*/, u8 msg[], void* /*context*/) {
++    (void)sender_id, (void)len, (void)msg, (void)context;
++}
 +const uint8_t *fuzzedData;
 +size_t fuzzedSize;
 +size_t fuzzedOffset;
@@ -83,7 +85,9 @@ index 00000000..45194ee0
 +  sbp_state_init(&s);
 +
 +  sbp_register_callback(&s, SBP_MSG_HEARTBEAT, &heartbeat_callback, NULL,
-+                        &heartbeat_callback_node);
++                        &&callback_node[0]);
++  sbp_register_callback(&s, SBP_MSG_POS_LLH_COV, &pos_llh_cov_callback, NULL, &callback_node[1]);
++
 +
 +  while(fuzzedOffset < fuzzedSize) {
 +    sbp_process(&s, &fuzz_read);

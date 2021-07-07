@@ -50,9 +50,6 @@ RUN apt-get update && apt-get install -y \
     wget \
     zip --no-install-recommends
 
-COPY install_perf.sh $WORK
-RUN $WORK/install_perf.sh && rm $WORK/install_perf.sh
-
 RUN git clone https://chromium.googlesource.com/chromium/src/tools/code_coverage /opt/code_coverage && \
     cd /opt/code_coverage && \
     git checkout edba4873b5e8a390e977a64c522db2df18a8b27d && \
@@ -109,6 +106,8 @@ RUN wget https://repo1.maven.org/maven2/org/jacoco/org.jacoco.cli/0.8.7/org.jaco
     echo "c1814e7bba5fd8786224b09b43c84fd6156db690  /opt/jacoco-cli.jar" | shasum --check
 
 RUN git clone --depth 1 https://github.com/brendangregg/FlameGraph /root/perf
+COPY install_perf.sh $WORK
+RUN $WORK/install_perf.sh && rm $WORK/install_perf.sh
 
 # Do this last to make developing these files easier/faster due to caching.
 COPY bad_build_check \

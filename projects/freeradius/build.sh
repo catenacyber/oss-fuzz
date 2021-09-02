@@ -26,7 +26,12 @@ mkdir -p $OUT/lib
 
 git apply --ignore-whitespace $SRC/patch.diff
 # build project
-./configure --enable-fuzzer --enable-address-sanitizer
+if [ "$SANITIZER" = "coverage" ]
+then
+    ./configure --enable-fuzzer
+else
+    ./configure --enable-fuzzer --enable-address-sanitizer
+fi
 # make tries to compile regular programs as fuzz targets
 # so -i flag ignores these errors
 make -i -j$(nproc)

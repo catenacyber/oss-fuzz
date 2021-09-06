@@ -1,0 +1,2 @@
+# Disable instrumentation for a specific function that the allowlist allowed
+fun:HashListTableFree

@@ -33,4 +33,5 @@ RUN git clone --depth 1 https://github.com/OISF/suricata.git suricata
 RUN git clone --depth 1 https://github.com/OISF/libhtp.git libhtp
 RUN git clone --depth 1 https://github.com/OISF/suricata-verify suricata-verify
 WORKDIR $SRC
+COPY blocklist.txt $SRC/
 COPY build.sh $SRC/

@@ -73,6 +73,7 @@ sh autogen.sh
 if [ "$SANITIZER" = "address" ]
 then
     export RUSTFLAGS="$RUSTFLAGS -Cpasses=sancov -Cllvm-args=-sanitizer-coverage-level=4 -Cllvm-args=-sanitizer-coverage-trace-compares -Cllvm-args=-sanitizer-coverage-inline-8bit-counters -Cllvm-args=-sanitizer-coverage-trace-geps -Cllvm-args=-sanitizer-coverage-prune-blocks=0 -Cllvm-args=-sanitizer-coverage-pc-table -Clink-dead-code -Cllvm-args=-sanitizer-coverage-stack-depth"
+    export CFLAGS="$CFLAGS -fsanitize-coverage-blocklist=$SRC/blocklist.txt"
 fi
 ./src/tests/fuzz/oss-fuzz-configure.sh
 make -j$(nproc)

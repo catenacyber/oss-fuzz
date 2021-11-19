@@ -15,6 +15,28 @@
 #
 ################################################################################
 
+(
+# Ignore memory leaks from python scripts invoked in the build
+export ASAN_OPTIONS="detect_leaks=0"
+export CPYTHON_INSTALL_PATH=$SRC/cpython-install
+rm -rf $CPYTHON_INSTALL_PATH
+mkdir $CPYTHON_INSTALL_PATH
+
+cd $SRC/cpython
+cp $SRC/python-library-fuzzers/python_coverage.h Python/
+
+# Patch the interpreter to record code coverage
+sed -i '1 s/^.*$/#include "python_coverage.h"/g' Python/ceval.c
+sed -i 's/case TARGET\(.*\): {/\0\nfuzzer_record_code_coverage(f->f_code, f->f_lasti);/g' Python/ceval.c
+
+./configure "${FLAGS[@]:-}" --prefix=$CPYTHON_INSTALL_PATH
+make -j$(nproc)
+make install
+
+cp -R $CPYTHON_INSTALL_PATH $OUT/
+)
+pip3 install numpy
+
 python3 setup.py build install
 
 # Build fuzzers in $OUT.

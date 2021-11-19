@@ -17,5 +17,11 @@
 FROM gcr.io/oss-fuzz-base/base-builder-python
 RUN git clone https://github.com/imageio/imageio
 
+RUN git clone --depth 1 https://github.com/python/cpython.git cpython
+RUN git clone --depth 1 https://github.com/guidovranken/python-library-fuzzers.git
+
+RUN apt update && apt-get install -y zlib1g-dev libjpeg8-dev
+RUN pip3 install numpy
+
 COPY build.sh $SRC/
 WORKDIR $SRC/imageio

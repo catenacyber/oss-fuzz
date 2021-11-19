@@ -18,6 +18,27 @@
 (
 # Ignore memory leaks from python scripts invoked in the build
 export ASAN_OPTIONS="detect_leaks=0"
+
+CFLAGS=${CFLAGS//"-pthread"/}
+
+FLAGS=()
+case $SANITIZER in
+  address)
+    FLAGS+=("--with-address-sanitizer")
+    ;;
+  memory)
+    FLAGS+=("--with-memory-sanitizer")
+    # installing ensurepip takes a while with MSAN instrumentation, so
+    # we disable it here
+    FLAGS+=("--without-ensurepip")
+    # -msan-keep-going is needed to allow MSAN's halt_on_error to function
+    FLAGS+=("CFLAGS=-mllvm -msan-keep-going=1")
+    ;;
+  undefined)
+    FLAGS+=("--with-undefined-behavior-sanitizer")
+    ;;
+esac
+
 export CPYTHON_INSTALL_PATH=$SRC/cpython-install
 rm -rf $CPYTHON_INSTALL_PATH
 mkdir $CPYTHON_INSTALL_PATH

@@ -28,7 +28,7 @@ go run main.go $FUZZ_NG_PKG
 
 (
 cd lpm
-$SRC/LPM/external.protobuf/bin/protoc --cpp_out=./ duggy/fuzzng/ngolofuzz.proto
+$SRC/LPM/external.protobuf/bin/protoc --cpp_out=./ ../duggy/fuzzng/ngolofuzz.proto
 $CXX -stdlib=libc++ -c -I . -I $SRC/LPM/external.protobuf/include ngolofuzz.pb.cc
 $CXX $CXXFLAGS -c -I. -I $SRC/libprotobuf-mutator/ -I $SRC/LPM/external.protobuf/include ngolofuzz.cc
 )

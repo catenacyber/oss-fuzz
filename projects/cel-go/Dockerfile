@@ -31,6 +31,8 @@ RUN go get google.golang.org/protobuf/cmd/protoc-gen-go
 
 COPY go-lpm.cc $SRC/
 
+RUN git clone --depth 1 https://github.com/catenacyber/ngolo-fuzzing.git
+
 COPY fuzz*.go $SRC/cel-go/cel/
 COPY build.sh $SRC/
 COPY *.proto $SRC/

@@ -34,11 +34,11 @@ $SRC/LPM/external.protobuf/bin/protoc --go_out=./ ngolofuzz.proto
 cp ./github.com/catenacyber/ngolo-fuzzing/duggy/*.pb.go ../duggy/
 $SRC/LPM/external.protobuf/bin/protoc --cpp_out=./ ngolofuzz.proto
 $CXX $CXXFLAGS -c -I . -I $SRC/LPM/external.protobuf/include ngolofuzz.pb.cc
-$CXX $CXXFLAGS -c -I. -I ../libprotobuf-mutator/ -I $SRC/LPM/external.protobuf/include ngolofuzz.cc
+$CXX $CXXFLAGS -c -I. -I $SRC/libprotobuf-mutator/ -I $SRC/LPM/external.protobuf/include ngolofuzz.cc
 )
 
 ./go114-fuzz-build/go114-fuzz-build -func FuzzNG_valid -o fuzz_ng.a github.com/catenacyber/ngolo-fuzzing/duggy
-$CXX $CXXFLAGS $LIB_FUZZING_ENGINE ngolofuzz.pb.o ngolofuzz.o fuzz_ng.a  $SRC/LPM/src/libfuzzer/libprotobuf-mutator-libfuzzer.a $SRC/LPM/src/libprotobuf-mutator.a $SRC/LPM/external.protobuf/lib/libprotobuf.a -o $OUT/fuzz_ng
+$CXX $CXXFLAGS $LIB_FUZZING_ENGINE ngf/ngolofuzz.pb.o ngf/ngolofuzz.o fuzz_ng.a  $SRC/LPM/src/libfuzzer/libprotobuf-mutator-libfuzzer.a $SRC/LPM/src/libprotobuf-mutator.a $SRC/LPM/external.protobuf/lib/libprotobuf.a -o $OUT/fuzz_ng
 
 exit 0
 )

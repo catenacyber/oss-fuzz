@@ -38,7 +38,8 @@ compile_go_fuzzer ./fuzz_ng_regexp FuzzNG_unsure fuzz_ng_go
 
 (
 cd lpm
-$SRC/LPM/external.protobuf/bin/protoc --cpp_out=./ ../fuzz_ng_regexp/ngolofuzz.proto
+cp ../fuzz_ng_regexp/ngolofuzz.proto .
+$SRC/LPM/external.protobuf/bin/protoc --cpp_out=./ ngolofuzz.proto
 $CXX -stdlib=libc++ -c -I . -I $SRC/LPM/external.protobuf/include ngolofuzz.pb.cc
 $CXX $CXXFLAGS -c -I. -I $SRC/libprotobuf-mutator/ -I $SRC/LPM/external.protobuf/include ngolofuzz.cc
 )

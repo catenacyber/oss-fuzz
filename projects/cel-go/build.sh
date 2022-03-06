@@ -17,28 +17,34 @@
 
 (
 cd $SRC/ngolo-fuzzing
-
+go build
 (
 cd go114-fuzz-build
 go build
 )
 
-export FUZZ_NG_PKG="github.com/catenacyber/ngolo-fuzzing/duggy"
-go run main.go $FUZZ_NG_PKG
+#export FUZZ_NG_PKG="github.com/catenacyber/ngolo-fuzzing/duggy"
+export FUZZ_NG_PKG="regexp"
+./ngolo-fuzzing $FUZZ_NG_PKG fuzz_ng_regexp
+
+(
+cd fuzz_ng_regexp
+$SRC/LPM/external.protobuf/bin/protoc --go_out=./ ngolofuzz.proto
+)
+
+compile_go_fuzzer ./fuzz_ng_regexp FuzzNG_unsure fuzz_ng_go
+
+./go114-fuzz-build/go114-fuzz-build -func FuzzNG_valid -o fuzz_ng.a ./fuzz_ng_regexp
 
 (
 cd lpm
-$SRC/LPM/external.protobuf/bin/protoc --cpp_out=./ ../duggy/fuzzng/ngolofuzz.proto
+$SRC/LPM/external.protobuf/bin/protoc --cpp_out=./ fuzz_ng_regexp/ngolofuzz.proto
 $CXX -stdlib=libc++ -c -I . -I $SRC/LPM/external.protobuf/include ngolofuzz.pb.cc
 $CXX $CXXFLAGS -c -I. -I $SRC/libprotobuf-mutator/ -I $SRC/LPM/external.protobuf/include ngolofuzz.cc
 )
 
-$SRC/LPM/external.protobuf/bin/protoc --go_out=./ duggy/fuzzng/ngolofuzz.proto
-cp ./$FUZZ_NG_PKG/fuzzng/*.pb.go duggy/fuzzng/
-
-
-./go114-fuzz-build/go114-fuzz-build -func FuzzNG_valid -o fuzz_ng.a github.com/catenacyber/ngolo-fuzzing/duggy/fuzzng
 $CXX $CXXFLAGS $LIB_FUZZING_ENGINE $SRC/ngolo-fuzzing/lpm/ngolofuzz.pb.o $SRC/ngolo-fuzzing/lpm/ngolofuzz.o fuzz_ng.a  $SRC/LPM/src/libfuzzer/libprotobuf-mutator-libfuzzer.a $SRC/LPM/src/libprotobuf-mutator.a $SRC/LPM/external.protobuf/lib/libprotobuf.a -o $OUT/fuzz_ng
+
 
 exit 0
 )

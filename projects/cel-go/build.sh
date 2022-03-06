@@ -25,7 +25,7 @@ go build
 
 #export FUZZ_NG_PKG="github.com/catenacyber/ngolo-fuzzing/duggy"
 export FUZZ_NG_PKG="regexp"
-./ngolo-fuzzing $FUZZ_NG_PKG fuzz_ng_regexp
+./ngolo-fuzzing -exclude Must $FUZZ_NG_PKG fuzz_ng_regexp
 
 (
 cd fuzz_ng_regexp

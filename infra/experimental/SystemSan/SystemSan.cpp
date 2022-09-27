@@ -31,7 +31,6 @@
 #include <sys/ptrace.h>
 #include <syscall.h>
 #include <fcntl.h>
-#include <arpa/inet.h>
 
 #include <fstream>
 #include <iostream>
@@ -40,6 +39,9 @@
 #include <sstream>
 #include <string>
 #include <vector>
+
+#include "inspect_utils.h"
+#include "inspect_dns.h"
 
 #define DEBUG_LOGS 0
 
@@ -72,8 +74,6 @@ const std::string kCorruptionError = "Shell corruption";
 const std::string kFzAbsoluteDirectory = "/fz/";
 // Arbitrary file open in /fz/
 const std::string kArbitraryFileOpenError = "Arbitrary file open";
-// Arbitrary domain name resolution
-const std::string kArbitraryDomainNameResolution = "Arbitrary domain name resolution";
 // Assuming only shorter (than this constant) top dir are legitly used.
 constexpr int kRootDirMaxLength = 16;
 
@@ -81,8 +81,6 @@ constexpr int kRootDirMaxLength = 16;
 pid_t g_root_pid;
 // Assuming the longest pathname is "/bin/bash".
 constexpr int kShellPathnameLength = 20;
-// Global constant for one file descriptor about of a DNS socket
-int kFdDns = 0;
 
 // Syntax error messages of each shell.
 const std::map<std::string, std::set<std::string>> kShellSyntaxErrors = {
@@ -153,23 +151,6 @@ pid_t run_child(char **argv) {
   return pid;
 }
 
-std::vector<std::byte> read_memory(pid_t pid, unsigned long long address,
-                                   size_t size) {
-  std::vector<std::byte> memory;
-
-  for (size_t i = 0; i < size; i += sizeof(long)) {
-    long word = ptrace(PTRACE_PEEKTEXT, pid, address + i, 0);
-    if (word == -1) {
-      return memory;
-    }
-
-    std::byte *word_bytes = reinterpret_cast<std::byte *>(&word);
-    memory.insert(memory.end(), word_bytes, word_bytes + sizeof(long));
-  }
-
-  return memory;
-}
-
 // Construct a string with the memory specified in a register.
 std::string read_string(pid_t pid, unsigned long reg, unsigned long length) {
   auto memory = read_memory(pid, reg, length);
@@ -180,16 +161,6 @@ std::string read_string(pid_t pid, unsigned long reg, unsigned long length) {
   std::string content(reinterpret_cast<char *>(memory.data()),
                       std::min(memory.size(), length));
   return content;
-}
-
-void report_bug(std::string bug_type) {
-  // Report the bug found based on the bug code.
-  std::cerr << "===BUG DETECTED: " << bug_type.c_str() << "===\n";
-  // Rely on sanitizers/libFuzzer to produce a stacktrace by sending SIGABRT
-  // to the root process.
-  // Note: this may not be reliable or consistent if shell injection happens
-  // in an async way.
-  tgkill(g_root_pid, g_root_pid, SIGABRT);
 }
 
 void inspect_for_injection(pid_t pid, const user_regs_struct &regs) {
@@ -331,117 +302,6 @@ void inspect_for_arbitrary_file_open(pid_t pid, const user_regs_struct &regs) {
   }
 }
 
-void inspect_for_arbitrary_dns_connect(pid_t pid, const user_regs_struct &regs) {
-  auto memory = read_memory(pid, regs.rsi, sizeof(struct sockaddr_in));
-  if (memory.size()) {
-    struct sockaddr_in * sa = reinterpret_cast<struct sockaddr_in *>(memory.data());
-    if (sa->sin_family == AF_INET && htons(sa->sin_port) == 53) {
-      // save file descriptor for later sendmmsg
-      kFdDns = regs.rdi;
-    }
-  }
-}
-
-#define DNS_HEADER_LEN 12
-
-void inspect_for_arbitrary_dns_pkt(std::vector<std::byte> data) {
-  if (data.size() < DNS_HEADER_LEN + 1) {
-    return;
-  }
-  // Standard query.
-  if ((uint8_t(data[2]) & 0xFE) != 0 || uint8_t(data[3]) != 0) {
-    return;
-  }
-  // One question.
-  if (uint8_t(data[4]) != 0 || uint8_t(data[5]) != 1) {
-    return;
-  }
-  // Zero answer and other fields.
-  for (size_t i = 6; i < DNS_HEADER_LEN; i++) {
-    if (uint8_t(data[i]) != 0) {
-      return;
-    }
-  }
-  size_t offset = DNS_HEADER_LEN;
-  uint8_t tld_size = 0;
-  while(offset < data.size()) {
-    uint8_t rlen = uint8_t(data[offset]);
-    if (rlen == 0) {
-      break;
-    }
-    offset += rlen+1;
-    tld_size = rlen;
-  }
-  // Regular DNS resolution should have 4 more bytes : type and class.
-  // Alert if the top level domain is only one character and
-  // if there is more than just the TLD.
-  if (tld_size == 1 && offset < data.size() && offset > DNS_HEADER_LEN+2) {
-    report_bug(kArbitraryDomainNameResolution);
-    offset = DNS_HEADER_LEN;
-    std::cerr << "===Domain resolved: ";
-    while(offset < data.size()) {
-      uint8_t rlen = uint8_t(data[offset]);
-      if (rlen == 0) {
-        break;
-      }
-      std::cerr << '.';
-      for (uint8_t i = 1; i < rlen+1; i++) {
-        std::cerr << (char) data[offset + i];
-      }
-      offset += rlen+1;
-      tld_size = rlen;
-    }
-    std::cerr << "===\n";
-  }
-}
-
-void inspect_for_arbitrary_dns_fdbuffer(pid_t pid, const user_regs_struct &regs) {
-  if (kFdDns > 0 && kFdDns == (int) regs.rdi) {
-    auto memory = read_memory(pid, regs.rsi, regs.rdx);
-    if (memory.size()) {
-      inspect_for_arbitrary_dns_pkt(memory);
-    }
-  }
-}
-
-void inspect_for_arbitrary_dns_sendmsg(pid_t pid, const user_regs_struct &regs) {
-  if (kFdDns > 0 && kFdDns == (int) regs.rdi) {
-    auto memory = read_memory(pid, regs.rsi, sizeof(struct msghdr));
-    if (memory.size()) {
-      struct msghdr * msg = reinterpret_cast<struct msghdr *>(memory.data());
-      if (msg->msg_iovlen == 1) {
-        memory = read_memory(pid, (unsigned long) msg->msg_iov, sizeof(struct iovec));
-        if (memory.size()) {
-          struct iovec * iovec = reinterpret_cast<struct iovec *>(memory.data());
-          memory = read_memory(pid, (unsigned long) iovec->iov_base, iovec->iov_len);
-          if (memory.size()) {
-            inspect_for_arbitrary_dns_pkt(memory);
-          }
-        }
-      }
-    }
-  }
-}
-
-void inspect_for_arbitrary_dns_sendmmsg(pid_t pid, const user_regs_struct &regs) {
-  if (kFdDns > 0 && kFdDns == (int) regs.rdi) {
-    auto memory = read_memory(pid, regs.rsi, sizeof(struct mmsghdr));
-    if (memory.size()) {
-      struct mmsghdr * msg = reinterpret_cast<struct mmsghdr *>(memory.data());
-      if (msg->msg_hdr.msg_iovlen == 1) {
-        memory = read_memory(pid, (unsigned long) msg->msg_hdr.msg_iov, sizeof(struct iovec));
-        if (memory.size()) {
-          struct iovec * iovec = reinterpret_cast<struct iovec *>(memory.data());
-          memory = read_memory(pid, (unsigned long) iovec->iov_base, iovec->iov_len);
-          if (memory.size()) {
-            inspect_for_arbitrary_dns_pkt(memory);
-          }
-        }
-      }
-    }
-  }
-}
-
 int trace(std::map<pid_t, Tracee> pids) {
   unsigned long exit_status = 0;
   while (!pids.empty()) {
@@ -536,24 +396,7 @@ int trace(std::map<pid_t, Tracee> pids) {
             }
           }
 
-          if (regs.orig_rax == __NR_connect) {
-            inspect_for_arbitrary_dns_connect(pid, regs);
-          }
-          if (regs.orig_rax == __NR_close) {
-            if (kFdDns > 0 && kFdDns == (int) regs.rdi) {
-              // reset DNS file descriptor on close
-              kFdDns = 0;
-            }
-          }
-          if (regs.orig_rax == __NR_sendmmsg) {
-            inspect_for_arbitrary_dns_sendmmsg(pid, regs);
-          }
-          if (regs.orig_rax == __NR_sendto || regs.orig_rax == __NR_write) {
-            inspect_for_arbitrary_dns_fdbuffer(pid, regs);
-          }
-          if (regs.orig_rax == __NR_sendmsg) {
-            inspect_for_arbitrary_dns_sendmsg(pid, regs);
-          }
+          inspect_dns_syscalls(pid, regs);
 
           if (regs.orig_rax == __NR_openat) {
             inspect_for_arbitrary_file_open(pid, regs);

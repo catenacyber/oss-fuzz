@@ -16,11 +16,15 @@
 /* A detector that uses ptrace to identify shell injection vulnerabilities. */
 
 /* POSIX */
+#include <sys/user.h>
 #include <unistd.h>
 
 /* Linux */
 #include <sys/ptrace.h>
+#include <syscall.h>
 #include <arpa/inet.h>
+
+#include <iostream>
 
 #include "inspect_utils.h"
 
@@ -105,7 +109,7 @@ void inspect_for_arbitrary_dns_fdbuffer(pid_t pid, const user_regs_struct &regs)
 }
 
 void inspect_for_arbitrary_dns_iov(pid_t pid, unsigned long iov) {
-  memory = read_memory(pid, iov, sizeof(struct iovec));
+  auto memory = read_memory(pid, iov, sizeof(struct iovec));
   if (memory.size()) {
     struct iovec * iovec = reinterpret_cast<struct iovec *>(memory.data());
     memory = read_memory(pid, (unsigned long) iovec->iov_base, iovec->iov_len);

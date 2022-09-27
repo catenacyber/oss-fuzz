@@ -15,12 +15,20 @@
  */
 /* A detector that uses ptrace to identify DNS arbitrary resolutions. */
 
+/* C standard library */
+#include <signal.h>
 
 /* POSIX */
 #include <unistd.h>
 
+/* Linux */
+#include <sys/ptrace.h>
+
+#include <iostream>
 #include <string>
 #include <vector>
+
+extern pid_t g_root_pid;
 
 std::vector<std::byte> read_memory(pid_t pid, unsigned long long address,
                                    size_t size) {

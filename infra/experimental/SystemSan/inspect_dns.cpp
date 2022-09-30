@@ -59,23 +59,23 @@ struct DnsHeader {
 
 struct DnsHeader parse_dns_header(std::vector<std::byte> data) {
   struct DnsHeader h;
-  h.tx_id = (data[0] << 8) | data[1];
-  h.flags = (data[2] << 8) | data[3];
-  h.questions = (data[4] << 8) | data[5];
-  h.answers = (data[6] << 8) | data[7];
-  h.nameservers = (data[8] << 8) | data[9];
-  h.additional = (data[10] << 8) | data[11];
+  h.tx_id = (((uint16_t) data[0]) << 8) | ((uint16_t) data[1]);
+  h.flags = (((uint16_t) data[2]) << 8) | ((uint16_t) data[3]);
+  h.questions = (((uint16_t) data[4]) << 8) | ((uint16_t) data[5]);
+  h.answers = (((uint16_t) data[6]) << 8) | ((uint16_t) data[7]);
+  h.nameservers = (((uint16_t) data[8]) << 8) | ((uint16_t) data[9]);
+  h.additional = (((uint16_t) data[10]) << 8) | ((uint16_t) data[11]);
   return h;
 }
 
 bool dns_flags_standard_query(uint16_t flags) {
-  if (flags & 0x8000 == 0) {
+  if ((flags & 0x8000) == 0) {
     // Query, not response.
-    if ((flags & 0x7800) >> 11 == 0) {
+    if (((flags & 0x7800) >> 11) == 0) {
       // Opcode 0 is standard query.
-      if (flags & 0x0200 == 0) {
+      if ((flags & 0x0200) == 0) {
         // Message is not truncated.
-        if (flags & 0x0040 == 0) {
+        if ((flags & 0x0040) == 0) {
           // Z-bit reserved flag is unset.
           return true;
         }
@@ -116,8 +116,8 @@ struct DnsRequest parse_dns_request(std::vector<std::byte> data, size_t offset) 
   }
   if (offset <= 4 + data.size()) {
     r.end = offset;
-    r.dns_type = (data[offset] << 8) | data[offset+1];
-    r.dns_class = (data[offset+2] << 8) | data[offset+3];
+    r.dns_type = (((uint16_t) data[offset]) << 8) | ((uint16_t) data[offset+1]);
+    r.dns_class = (((uint16_t) data[offset+2]) << 8) | ((uint16_t) data[offset+3]);
   } else {
     r.end = data.size();
   }
@@ -153,11 +153,11 @@ void inspect_for_arbitrary_dns_pkt(std::vector<std::byte> data) {
   if (h.answers != 0 || h.nameservers != 0 || h.additional != 0) {
     return;
   }
-  if dns_flags_standard_query(h.flags) {
+  if (dns_flags_standard_query(h.flags)) {
     return;
   }
 
-  struct DnsRequest req = parse_dns_request(data, DNS_HEADER_LEN)
+  struct DnsRequest req = parse_dns_request(data, DNS_HEADER_LEN);
   // Alert if the top level domain is only one character and
   // if there is more than just the TLD.
   if (req.tld_size == 1 && req.nb_levels > 1 && req.end < data.size()) {

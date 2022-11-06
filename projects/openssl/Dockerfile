@@ -21,3 +21,12 @@ WORKDIR openssl
 COPY build.sh *.options $SRC/
 ENV AFL_SKIP_OSSFUZZ=1
 ENV AFL_LLVM_MODE_WORKAROUND=0
+
+RUN apt-get update && apt-get install -y protobuf-compiler libprotobuf-dev binutils cmake \
+   ninja-build liblzma-dev libz-dev pkg-config autoconf libtool
+RUN git clone --depth 1 https://github.com/google/libprotobuf-mutator.git
+RUN (mkdir LPM && cd LPM && cmake ../libprotobuf-mutator -GNinja -DLIB_PROTO_MUTATOR_DOWNLOAD_PROTOBUF=ON -DLIB_PROTO_MUTATOR_TESTING=OFF -DCMAKE_BUILD_TYPE=Release && ninja)
+
+# TODO add these
+COPY *.proto $SRC/aware/
+COPY *.cc *.h $SRC/aware/

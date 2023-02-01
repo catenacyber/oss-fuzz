@@ -17,6 +17,6 @@
 FROM gcr.io/oss-fuzz-base/base-builder
 RUN apt-get update && apt-get install -y cmake libtool make
 
-RUN git clone --depth 1 https://github.com/google/brotli.git
+RUN git clone --depth 1 --branch fuzz https://github.com/catenacyber/brotli.git
 WORKDIR brotli
 COPY build.sh $SRC/

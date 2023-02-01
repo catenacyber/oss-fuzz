@@ -15,6 +15,7 @@
 #
 ################################################################################
 
+export CFLAGS="$CFLAGS -Wimplicit-int-conversion"
 cmake . -DBUILD_TESTING=OFF -DBUILD_SHARED_LIBS=OFF
 make clean
 make -j$(nproc) brotlidec brotlienc

@@ -109,6 +109,10 @@ ENV FUZZER_LDFLAGS ""
 
 WORKDIR $SRC
 
+COPY nallocfuzz.c $SRC
+COPY precompile_nallocfuzz /usr/local/bin/
+RUN precompile_nallocfuzz
+
 RUN git clone https://github.com/AFLplusplus/AFLplusplus.git aflplusplus && \
     cd aflplusplus && \
     git checkout a7877416a87506424053e52e41f7a995c05367a4 && \
@@ -130,10 +134,6 @@ RUN cd $SRC && \
 
 COPY precompile_honggfuzz /usr/local/bin/
 RUN precompile_honggfuzz
-
-COPY nallocfuzz.c $SRC
-COPY precompile_nallocfuzz /usr/local/bin/
-RUN precompile_nallocfuzz
 
 RUN cd $SRC && \
     git clone https://github.com/google/centipede.git && \

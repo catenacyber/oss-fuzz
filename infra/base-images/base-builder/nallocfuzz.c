@@ -1,3 +1,6 @@
+// for RTLD_NEXT
+#define _GNU_SOURCE
+
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
@@ -216,6 +219,9 @@ void fuzz_nalloc_init() {
     }
 
 }
+
+int LLVMFuzzerRunDriver(int *argc, char ***argv,
+                  int (*UserCb)(const uint8_t *Data, size_t Size));
 
 int main(int argc, char **argv) {
     fuzz_nalloc_init();

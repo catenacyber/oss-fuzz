@@ -131,6 +131,10 @@ RUN cd $SRC && \
 COPY precompile_honggfuzz /usr/local/bin/
 RUN precompile_honggfuzz
 
+COPY nallocfuzz.c $SRC
+COPY precompile_nallocfuzz /usr/local/bin/
+RUN precompile_nallocfuzz
+
 RUN cd $SRC && \
     git clone https://github.com/google/centipede.git && \
     cd centipede && \
@@ -145,6 +149,7 @@ COPY cargo compile compile_afl compile_libfuzzer compile_honggfuzz \
     compile_go_fuzzer \
     compile_javascript_fuzzer \
     compile_native_go_fuzzer \
+    compile_nallocfuzz \
     compile_python_fuzzer \
     compile_fuzztests.sh \
     python_coverage_helper.py \

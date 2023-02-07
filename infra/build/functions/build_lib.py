@@ -82,6 +82,10 @@ ENGINE_INFO = {
         EngineInfo(upload_bucket='clusterfuzz-builds-centipede',
                    supported_sanitizers=['address', 'none'],
                    supported_architectures=['x86_64']),
+    'quadfuzz':
+        EngineInfo(upload_bucket='clusterfuzz-builds-quadfuzz',
+                   supported_sanitizers=['address'],
+                   supported_architectures=['x86_64']),
 }
 
 OSS_FUZZ_BUILDPOOL_NAME = os.getenv(

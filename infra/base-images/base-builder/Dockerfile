@@ -109,6 +109,10 @@ ENV FUZZER_LDFLAGS ""
 
 WORKDIR $SRC
 
+RUN git clone --depth 1 https://github.com/catenacyber/quadfuzz.git
+COPY precompile_quadfuzz /usr/local/bin/
+RUN precompile_quadfuzz
+
 RUN git clone https://github.com/AFLplusplus/AFLplusplus.git aflplusplus && \
     cd aflplusplus && \
     git checkout a7877416a87506424053e52e41f7a995c05367a4 && \
@@ -153,6 +157,7 @@ COPY bazel_build_fuzz_tests \
     compile_javascript_fuzzer \
     compile_libfuzzer \
     compile_native_go_fuzzer \
+    compile_quadfuzz \
     compile_python_fuzzer \
     debug_afl \
     # Go, JavaScript, Java, Python, Rust, and Swift installation scripts.

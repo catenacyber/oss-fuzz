@@ -17,7 +17,7 @@
 
 echo "Precompiling nallocfuzz"
 
-clang $SRC/nallocfuzz.c -o $SRC/nallocfuzz.o
+clang -c $SRC/nallocfuzz.c -o $SRC/nallocfuzz.o
 
 ar rcs $SRC/nallocfuzz.a $SRC/nallocfuzz.o /usr/local/lib/clang/*/lib/linux/libclang_rt.fuzzer_no_main-$ARCHITECTURE.a
 

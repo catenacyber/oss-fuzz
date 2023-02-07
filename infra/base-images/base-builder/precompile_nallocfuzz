@@ -17,11 +17,10 @@
 
 echo "Precompiling nallocfuzz"
 
-clang -fPIE -c $SRC/nallocfuzz/nallocfuzz.c -o $SRC/nallocfuzz/nallocfuzz.o
-
 pushd $SRC/nallocfuzz/ > /dev/null
+clang -fPIE -c nallocfuzz.c -o nallocfuzz.o
 ar -x /usr/local/lib/clang/*/lib/linux/libclang_rt.fuzzer_no_main-$ARCHITECTURE.a
-ar rcs $SRC/nallocfuzz/nallocfuzz.a nallocfuzz.o fuzzer_no_main.o
+ar rcs nallocfuzz.a nallocfuzz.o fuzzer_no_main.o
 rm *.o
 popd > /dev/null
 

@@ -167,6 +167,9 @@ static bool fuzz_nalloc_fail(size_t size) {
 }
 
 void *calloc(size_t nmemb, size_t size) {
+    if (fuzz_nalloc_orig_calloc == NULL) {
+        fuzz_nalloc_orig_calloc = dlsym(RTLD_NEXT, "calloc");
+    }
     if (fuzz_nalloc_fail(size)) {
         return NULL;
     }
@@ -174,6 +177,9 @@ void *calloc(size_t nmemb, size_t size) {
 }
 
 void *malloc(size_t size) {
+    if (fuzz_nalloc_orig_malloc == NULL) {
+        fuzz_nalloc_orig_malloc = dlsym(RTLD_NEXT, "malloc");
+    }
     if (fuzz_nalloc_fail(size)) {
         return NULL;
     }
@@ -181,6 +187,9 @@ void *malloc(size_t size) {
 }
 
 void *realloc(void *ptr, size_t size) {
+    if (fuzz_nalloc_orig_realloc == NULL) {
+        fuzz_nalloc_orig_realloc = dlsym(RTLD_NEXT, "realloc");
+    }
     if (fuzz_nalloc_fail(size)) {
         return NULL;
     }
@@ -195,10 +204,6 @@ int NaloFuzzerTestOneInput(const uint8_t *data, size_t size) {
 }
 
 void fuzz_nalloc_init() {
-    fuzz_nalloc_orig_realloc = dlsym(RTLD_NEXT, "realloc");
-    fuzz_nalloc_orig_malloc = dlsym(RTLD_NEXT, "malloc");
-    fuzz_nalloc_orig_calloc = dlsym(RTLD_NEXT, "calloc");
-
     struct sigaction new_action;
     sigemptyset (&new_action.sa_mask);
     new_action.sa_sigaction = fuzz_nalloc_sig_handler;
@@ -225,5 +230,8 @@ int LLVMFuzzerRunDriver(int *argc, char ***argv,
 
 int main(int argc, char **argv) {
     fuzz_nalloc_init();
-    return LLVMFuzzerRunDriver(&argc, &argv, NaloFuzzerTestOneInput);
+    printf("loli\n");
+    int r = LLVMFuzzerRunDriver(&argc, &argv, NaloFuzzerTestOneInput);
+    printf("lolr %d\n", r);
+    return r;
 }

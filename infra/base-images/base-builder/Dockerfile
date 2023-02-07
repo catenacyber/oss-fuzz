@@ -109,7 +109,7 @@ ENV FUZZER_LDFLAGS ""
 
 WORKDIR $SRC
 
-COPY nallocfuzz.c $SRC/nallocfuzz/
+COPY nallocfuzz*.c $SRC/nallocfuzz/
 COPY precompile_nallocfuzz /usr/local/bin/
 RUN precompile_nallocfuzz
 

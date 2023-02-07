@@ -1,18 +1,11 @@
-// for RTLD_NEXT
-#define _GNU_SOURCE
-
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
 
-// dlsym
-#include <dlfcn.h>
 // stacktrace
 #include <execinfo.h>
 #include <stdio.h>
-// binary patch
-#include <sys/mman.h>
 
 #include<signal.h>
 
@@ -129,14 +122,10 @@ static void fuzz_nalloc_save_backtrace(void) {
     fuzz_nalloc_backtrace_strs = backtrace_symbols(callstack, fuzz_nalloc_backtrace_frames);
 }
 
-static void* (*fuzz_nalloc_orig_realloc)(void*, size_t)=NULL;
-static void* (*fuzz_nalloc_orig_malloc)(size_t)=NULL;
-static void* (*fuzz_nalloc_orig_calloc)(size_t, size_t)=NULL;
-
 char * fuzz_nalloc_exclude = NULL;
 uint32_t fuzz_nalloc_bitmask = 0xFF;
 
-static bool fuzz_nalloc_fail(size_t size) {
+static bool fuzz_nalloc_fail_impl(size_t size) {
     fuzz_nalloc_random_update((uint8_t) size);
     if (size >= 0x100) {
         fuzz_nalloc_random_update((uint8_t) (size >> 8));
@@ -166,42 +155,14 @@ static bool fuzz_nalloc_fail(size_t size) {
     return false;
 }
 
-void *calloc(size_t nmemb, size_t size) {
-    if (fuzz_nalloc_orig_calloc == NULL) {
-        fuzz_nalloc_orig_calloc = dlsym(RTLD_NEXT, "calloc");
-    }
-    if (fuzz_nalloc_fail(size)) {
-        return NULL;
-    }
-    return fuzz_nalloc_orig_calloc(nmemb, size);
-}
-
-void *malloc(size_t size) {
-    if (fuzz_nalloc_orig_malloc == NULL) {
-        fuzz_nalloc_orig_malloc = dlsym(RTLD_NEXT, "malloc");
-    }
-    if (fuzz_nalloc_fail(size)) {
-        return NULL;
-    }
-    return fuzz_nalloc_orig_malloc(size);
-}
-
-void *realloc(void *ptr, size_t size) {
-    if (fuzz_nalloc_orig_realloc == NULL) {
-        fuzz_nalloc_orig_realloc = dlsym(RTLD_NEXT, "realloc");
-    }
-    if (fuzz_nalloc_fail(size)) {
-        return NULL;
-    }
-    return fuzz_nalloc_orig_realloc(ptr, size);
-}
-
 int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size);
 
 int NaloFuzzerTestOneInput(const uint8_t *data, size_t size) {
     fuzz_nalloc_random_seed(data, size);
     return LLVMFuzzerTestOneInput(data, size);
 }
+
+extern bool (*fuzz_nalloc_fail) (size_t);
 
 void fuzz_nalloc_init() {
     struct sigaction new_action;
@@ -222,7 +183,7 @@ void fuzz_nalloc_init() {
             fuzz_nalloc_bitmask = 1 << shift;
         }
     }
-
+    fuzz_nalloc_fail = fuzz_nalloc_fail_impl;
 }
 
 int LLVMFuzzerRunDriver(int *argc, char ***argv,

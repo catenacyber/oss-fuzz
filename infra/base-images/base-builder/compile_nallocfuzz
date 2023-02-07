@@ -18,5 +18,6 @@
 echo "Skipping compilation; using precompiled nallocfuzz"
 
 cp $SRC/nallocfuzz/nallocfuzz.a $LIB_FUZZING_ENGINE
+cp $SRC/nallocfuzz/nallocfuzz_preload.so $OUT/
 
 echo " done."

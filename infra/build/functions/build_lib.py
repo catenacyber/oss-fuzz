@@ -86,7 +86,6 @@ ENGINE_INFO = {
         EngineInfo(upload_bucket='clusterfuzz-builds-nallocfuzz',
                    supported_sanitizers=['address'],
                    supported_architectures=['x86_64']),
-
 }
 
 OSS_FUZZ_BUILDPOOL_NAME = os.getenv(

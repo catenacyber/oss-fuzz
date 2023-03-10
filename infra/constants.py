@@ -45,4 +45,12 @@ SANITIZERS = [
     'hwaddress',
 ]
 ARCHITECTURES = ['i386', 'x86_64', 'aarch64']
-ENGINES = ['libfuzzer', 'afl', 'honggfuzz', 'centipede', 'none', 'wycheproof', 'nallocfuzz']
+ENGINES = [
+    'libfuzzer',
+    'afl',
+    'honggfuzz',
+    'centipede',
+    'none',
+    'wycheproof',
+    'nallocfuzz',
+]

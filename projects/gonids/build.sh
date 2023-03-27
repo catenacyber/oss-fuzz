@@ -17,7 +17,11 @@
 
 #patch
 cp regexp/regexp.go /root/.go/src/regexp/
-compile_go_fuzzer github.com/google/gonids FuzzParseRule fuzz_parserule
+compile_go_fuzzer github.com/google/gonids FuzzParseRule fuzz_regexp
+go-fuzz -tags gofuzz -func FuzzParseRule -o fuzz.a .
+$CC $CFLAGS -c onefile.c -o onefile.o
+$CXX $CXXFLAGS onefile.o fuzz.a -o $OUT/fuzz_c
+
 go build fuzzr/fuzz_parserule.go
 cp fuzz_parserule $OUT/fuzz_parserule_go
 

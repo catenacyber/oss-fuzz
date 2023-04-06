@@ -15,12 +15,17 @@
 #
 ################################################################################
 
+(
+cd go114-fuzz-build
+go build
+ln -s go114-fuzz-build $GOPATH/bin/go-fuzz
+)
+
 #patch
 cp regexp/regexp.go /root/.go/src/regexp/
-compile_go_fuzzer github.com/google/gonids FuzzParseRule fuzz_regexp
-go-fuzz -tags gofuzz -func FuzzParseRule -o fuzz.a .
-$CC $CFLAGS -c onefile.c -o onefile.o
-$CXX $CXXFLAGS onefile.o fuzz.a -o $OUT/fuzz_c
+#compile_go_fuzzer github.com/google/gonids FuzzParseRule fuzz_regexp
+go-fuzz -race -func FuzzParseRule -o fuzz.a .
+$CXX $CXXFLAGS $LIB_FUZZING_ENGINE fuzz.a -o $OUT/fuzz_parserule
 
 go build fuzzr/fuzz_parserule.go
 cp fuzz_parserule $OUT/fuzz_parserule_go

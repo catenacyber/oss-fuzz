@@ -15,20 +15,11 @@
 #
 ################################################################################
 
-(
-cd go114-fuzz-build
-go build
-ln -s go114-fuzz-build $GOPATH/bin/go-fuzz
-)
-
 #patch
 cp regexp/regexp.go /root/.go/src/regexp/
-#compile_go_fuzzer github.com/google/gonids FuzzParseRule fuzz_regexp
-go-fuzz -race -func FuzzParseRule -o fuzz.a .
-$CXX $CXXFLAGS $LIB_FUZZING_ENGINE fuzz.a -o $OUT/fuzz_parserule
 
-go build fuzzr/fuzz_parserule.go
-cp fuzz_parserule $OUT/fuzz_parserule_go
+/root/.go/bin/go build -o fuzz.a -buildmode c-archive -gcflags all=-d=libfuzzer -tags gofuzz,gofuzz_libfuzzer,libfuzzer -trimpath -gcflags syscall=-d=libfuzzer=0
+$CXX $LIB_FUZZING_ENGINE fuzz.a -o $OUT/fuzz_parserule
 
 # use different GODEBUG env variables for https://github.com/golang/go/issues/49075
 cp $SRC/gobughunt/fuzz_parserule.options $OUT/

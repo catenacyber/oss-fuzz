@@ -19,7 +19,7 @@
 cp regexp/regexp.go /root/.go/src/regexp/
 
 compile_go_fuzzer github.com/google/gonids FuzzParseRule fuzz_parserule
-/root/.go/bin/go build -o fuzz.a -buildmode c-archive -gcflags all=-d=libfuzzer -trimpath -gcflags syscall=-d=libfuzzer=0 cfuzz.go
+/root/.go/bin/go build -o fuzz.a -buildmode c-archive -gcflags all=-d=libfuzzer -tags libfuzzer -trimpath -gcflags syscall=-d=libfuzzer=0 cfuzz.go
 clang++ -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -stdlib=libc++ -fsanitize=fuzzer fuzz.a -o fuzz_parse
 cp fuzz_parse $OUT/fuzz_parse2
 

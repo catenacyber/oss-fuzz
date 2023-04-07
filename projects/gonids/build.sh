@@ -18,8 +18,9 @@
 #patch
 cp regexp/regexp.go /root/.go/src/regexp/
 
-/root/.go/bin/go build -o fuzz.a -buildmode c-archive -gcflags all=-d=libfuzzer -tags gofuzz,gofuzz_libfuzzer,libfuzzer -trimpath -gcflags syscall=-d=libfuzzer=0
-$CXX $LIB_FUZZING_ENGINE fuzz.a -o $OUT/fuzz_parserule
+compile_go_fuzzer github.com/google/gonids FuzzParseRule fuzz_parserule
+/root/.go/bin/go build -o fuzz.a -buildmode c-archive -gcflags all=-d=libfuzzer -tags gofuzz,gofuzz_libfuzzer,libfuzzer -trimpath -gcflags syscall=-d=libfuzzer=0 cfuzz.go
+$CXX $CXXFLAGS $LIB_FUZZING_ENGINE fuzz.a -o $OUT/fuzz_parse
 
 # use different GODEBUG env variables for https://github.com/golang/go/issues/49075
 cp $SRC/gobughunt/fuzz_parserule.options $OUT/

@@ -24,7 +24,7 @@ cp regexp/regexp.go /root/.go/src/regexp/
 # or go-fuzz $tags -func $function -o $fuzzer.a $path
 compile_go_fuzzer github.com/google/gonids FuzzParseRule fuzz_fail
 
-/root/.go/bin/go build -o fuzz.a -buildmode c-archive -gcflags all=-d=libfuzzer -tags gofuzz,gofuzz_libfuzzer -trimpath -gcflags syscall=-d=libfuzzer=0 cfuzz.go
+/root/.go/bin/go build -o fuzz.a -buildmode c-archive -gcflags all=-d=libfuzzer -tags gofuzz,gofuzz_libfuzzer,libfuzzer -trimpath -gcflags syscall=-d=libfuzzer=0 cfuzz.go
 clang++ -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -stdlib=libc++ -fsanitize=fuzzer fuzz.a -o $OUT/fuzz_steps
 
 sed -i -e 's/go l/l/' lex.go

@@ -18,16 +18,23 @@
 #patch
 cp regexp/regexp.go /root/.go/src/regexp/
 
-#TODO : build failing with goroutine
-# not failing without goroutine
-# maybe with gonids modifications = remove unused code
-# or go-fuzz $tags -func $function -o $fuzzer.a $path
+# fails early
 compile_go_fuzzer github.com/google/gonids FuzzParseRule fuzz_fail
 
+# fails 15 hours later
 /root/.go/bin/go build -o fuzz.a -buildmode c-archive -gcflags all=-d=libfuzzer -tags gofuzz,gofuzz_libfuzzer,libfuzzer -trimpath -gcflags syscall=-d=libfuzzer=0 cfuzz.go
 clang++ -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -stdlib=libc++ -fsanitize=fuzzer fuzz.a -o $OUT/fuzz_steps
 
+# Testing
+clang++ -stdlib=libc++ -fsanitize=fuzzer fuzz.a -o $OUT/fuzz_basic
+clang++ -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -stdlib=libc++ -fsanitize=fuzzer fuzz.a -o $OUT/fuzz_libfuzz
+
+/root/.go/bin/go build -o fuzzgo.a -buildmode c-archive cfuzz.go
+clang++ -O1 -fno-omit-frame-pointer -gline-tables-only -DFUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION -fsanitize=address -fsanitize-address-use-after-scope -fsanitize=fuzzer-no-link -stdlib=libc++ -fsanitize=fuzzer fuzzgo.a -o $OUT/fuzz_go
+
+
 sed -i -e 's/go l/l/' lex.go
+# fails early 14 more hours later
 compile_go_fuzzer github.com/google/gonids FuzzParseRule fuzz_nogo
 
 

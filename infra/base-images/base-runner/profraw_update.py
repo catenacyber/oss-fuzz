@@ -58,6 +58,12 @@ def upgrade(data, sect_prf_cnts, sect_prf_data):
     generic_header = generic_header._replace(version=8)
     data = data[:8] + struct.pack('Q', generic_header.version) + data[16:]
   v7_header = HeaderVersion7._make(struct.unpack('QQQQQQQQQ', data[16:88]))
+  if generic_header.version == 9:
+    # see https://reviews.llvm.org/D138846
+    generic_header = generic_header._replace(version=8)
+    # Downgrade from version 9 to 8 by removing NumBitmapBytes, PaddingBytesAfterBitmapBytes and BitmapDelta fields.
+    data =  data[:8] + struct.pack('Q', generic_header.version) + data[16:56] + data[72:88] + data[96:]
+    return data
 
   if v7_header.BinaryIdsSize % 8 != 0:
     # Adds padding for binary ids.

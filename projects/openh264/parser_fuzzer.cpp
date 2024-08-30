@@ -47,23 +47,23 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
   int32_t iSliceSize;
   ISVCDecoder *pDecoder;
   SDecodingParam sDecParam = {0};
-  SBufferInfo sDstBufInfo;
+  //SBufferInfo sDstBufInfo;
+  SParserBsInfo sDstParseInfo;
   std::unique_ptr<uint8_t[]> pBuf(new uint8_t[size + 4]);
   uint8_t* pData[3] = {NULL};
   uint8_t uiStartCode[4] = {0, 0, 0, 1};
 
   memcpy(pBuf.get(), data, size);
   memcpy(pBuf.get() + size, &uiStartCode[0], 4);
-  memset(&sDstBufInfo, 0, sizeof(SBufferInfo));
+  //memset(&sDstBufInfo, 0, sizeof(SBufferInfo));
+  memset(&sDstParseInfo, 0, sizeof(SParserBsInfo));
 
   // TODO: is this the best/fastest ERROR_CON to use?
   sDecParam.eEcActiveIdc = ERROR_CON_SLICE_COPY;
-  if (size > 0 && (data[size/2] & 1)) {
-    sDecParam.sVideoProperty.eVideoBsType = VIDEO_BITSTREAM_AVC;
-  } else {
-    sDecParam.sVideoProperty.eVideoBsType = VIDEO_BITSTREAM_SVC;
-  }
-  
+  // TODO: should we also fuzz VIDEO_BITSTREAM_SVC?
+  sDecParam.sVideoProperty.eVideoBsType = VIDEO_BITSTREAM_AVC;
+  sDecParam.bParseOnly = true;
+
   WelsCreateDecoder (&pDecoder);
   pDecoder->Initialize (&sDecParam);
   pDecoder->SetOption (DECODER_OPTION_TRACE_LEVEL, &iLevelSetting);
@@ -92,7 +92,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
       continue;
     }
 
-    pDecoder->DecodeFrameNoDelay (pBuf.get() + iBufPos, iSliceSize, pData, &sDstBufInfo);
+    //pDecoder->DecodeFrameNoDelay (pBuf.get() + iBufPos, iSliceSize, pData, &sDstBufInfo);
+    pDecoder->DecodeParser(pBuf.get() + iBufPos, iSliceSize, &sDstParseInfo);
     iBufPos += iSliceSize;
   }
 

@@ -50,7 +50,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
     return 0;
   }
 
-  SEncParamExt param = {0};
+  SEncParamBase param;
+    memset (&param, 0, sizeof (SEncParamBase));
     if (data[0] & 1) {
         param.iUsageType = SCREEN_CONTENT_REAL_TIME;
     } else {
@@ -61,10 +62,12 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
   param.iPicHeight = 1+(((data[4] << 8) + data[5]) % 2048);
   param.iTargetBitrate = 1<<(data[2] & 0x1F);
   int videoFormat = videoFormatI420;
-  pEncoder->InitializeExt (&param);
+  pEncoder->Initialize (&param);
   pEncoder->SetOption (ENCODER_OPTION_TRACE_LEVEL, &iLevelSetting);
   if (pEncoder->SetOption (ENCODER_OPTION_DATAFORMAT, &videoFormat) != 0 ) {
-    goto label_cleanup;
+      pEncoder->Uninitialize ();
+      WelsDestroySVCEncoder (pEncoder);
+    return 0;
   }
 
     data += 8;
@@ -95,9 +98,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
         size -= imsize;
     }
     free(imbuf);
-label_cleanup:
+
     pEncoder->Uninitialize ();
     WelsDestroySVCEncoder (pEncoder);
-
   return 0;
 }

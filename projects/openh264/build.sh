@@ -24,3 +24,4 @@ fi
 make -j$(nproc) ARCH=$ARCHITECTURE USE_ASM=$ASM_BUILD BUILDTYPE=Debug libopenh264.a
 $CXX $CXXFLAGS -o $OUT/decoder_fuzzer -I./codec/api/wels -I./codec/console/common/inc -I./codec/common/inc -L. $LIB_FUZZING_ENGINE $SRC/decoder_fuzzer.cpp libopenh264.a
 $CXX $CXXFLAGS -o $OUT/parser_fuzzer -I./codec/api/wels -I./codec/console/common/inc -I./codec/common/inc -L. $LIB_FUZZING_ENGINE $SRC/parser_fuzzer.cpp libopenh264.a
+$CXX $CXXFLAGS -o $OUT/encoder_fuzzer -I./codec/api/wels -I./codec/console/common/inc -I./codec/common/inc -L. $LIB_FUZZING_ENGINE $SRC/encoder_fuzzer.cpp libopenh264.a

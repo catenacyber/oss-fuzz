@@ -24,6 +24,7 @@ ENV GOPATH /root/go
 ENV PATH $PATH:/root/.go/bin:$GOPATH/bin
 
 COPY gosigfuzz.c $GOPATH/gosigfuzz/
+RUN git clone --depth 1 --branch gowarn https://github.com/catenacyber/go $SRC/gowarn
 
 RUN install_go.sh
 

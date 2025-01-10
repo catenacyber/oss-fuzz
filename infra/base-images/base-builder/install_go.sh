@@ -41,3 +41,5 @@ git clone https://github.com/AdamKorcz/go-118-fuzz-build
 cd go-118-fuzz-build
 go build
 mv go-118-fuzz-build $GOPATH/bin/
+
+cp -r $SRC/gowarn/src/* /root/.go/src/

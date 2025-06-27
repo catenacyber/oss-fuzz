@@ -23,7 +23,8 @@ pushd libbacktrace > /dev/null
 make -j$(nproc)
 popd > /dev/null
 clang -fPIE -I. -c nallocfuzz.c -o nallocfuzz.o
-ar -x /usr/local/lib/clang/*/lib/linux/libclang_rt.fuzzer_no_main-$ARCHITECTURE.a
+# /usr/local/lib/clang/18/lib/x86_64-unknown-linux-gnu/libclang_rt.fuzzer_no_main.a
+ar -x /usr/local/lib/clang/*/lib/$ARCHITECTURE-unknown-linux-gnu/libclang_rt.fuzzer_no_main.a
 ar -x libbacktrace/.libs/libbacktrace.a
 ar rcs nallocfuzz.a *.o
 rm *.o

@@ -88,6 +88,9 @@ then
     fuzz_branches+=("7")
 fi
 
+chmod +x $SRC/rustc.py
+export RUSTC="$SRC/rustc.py"
+
 if [[ `shuf -i 0-9 -n 1` -eq 0 ]]
 then
     # adds quadratic complexity custom mutator one random build out of 10
